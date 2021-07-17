@@ -1,0 +1,19 @@
+#Setting File
+
+#[n]:TAG
+#Write in the 0 Column
+#If you move the Column, it will be commented out.
+
+#Debug True / False
+[a]True
+#Save folder
+[b]pdfUrl
+#Save fileName(including extension)
+[c]pdfUrl.txt
+#Base URL
+[d]https://www.fukushihoken.metro.tokyo.lg.jp
+#Top URL
+[e]/hodo/saishin/hassei.html
+#Base URL(previous PDF link)
+[f]https://www.metro.tokyo.lg.jp
+
