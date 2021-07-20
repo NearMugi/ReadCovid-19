@@ -78,7 +78,7 @@ class base:
         return self.baseURL, self.topURL, self.previousPDFLinkURL
     
     def setSaveData(self, _data):
-        self.saveData.append(_data + "\n")
+        self.saveData.append(_data)
         
     def saveGetData(self):
         print('[Save Data]')
@@ -99,7 +99,7 @@ class base:
 
 # ## スクレイピング本体
 
-# In[3]:
+# In[8]:
 
 
 class work:
@@ -144,7 +144,9 @@ class work:
         _bsPDFPathList = bs.findAll("a", {"class":"resourceLink newWindow"})
         for _url in _bsPDFPathList:
             print(_url["href"])
-            b.setSaveData(_baseUrl + "/" + _url["href"])
+            name = _url["href"].replace("/", "")
+            saveData = '{ "name" : "' + name + '", "url" : "' + _baseUrl + '/hodo/saishin/' + _url["href"] + '"}\n'
+            b.setSaveData(saveData)
         
         # previous PDF Link
         print("get Previous PDF Link")
@@ -156,7 +158,9 @@ class work:
             
             for _url in _bsPDFPathList:
                 print(_url["href"])
-                b.setSaveData(_previousPDFLinkURL + _url["href"])
+                name = _url["href"].replace("/", "")
+                saveData = '{ "name" : "' + name + '", "url" : "' + _previousPDFLinkURL + _url["href"] + '"}\n'
+                b.setSaveData(saveData)
         
         return True
 
@@ -235,7 +239,7 @@ def main():
 
 # ## 処理開始
 
-# In[5]:
+# In[9]:
 
 
 if __name__ == '__main__':
