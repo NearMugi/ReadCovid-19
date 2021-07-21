@@ -9,11 +9,14 @@
 #Save folder
 [b]pdfUrl
 #Save fileName(including extension)
-[c]pdfUrl.txt
+[c]pdfUrl.json
 #Base URL
 [d]https://www.fukushihoken.metro.tokyo.lg.jp
 #Top URL
 [e]/hodo/saishin/hassei.html
 #Base URL(previous PDF link)
 [f]https://www.metro.tokyo.lg.jp
-
+#Prefix for LastData
+[g]Last_
+#Prefix for previousData
+[h]Previous_

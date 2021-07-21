@@ -13,16 +13,29 @@
 #   - 設定ファイル
 #     - 保存先の親フォルダを指定
 # - getURL.py
-#   - 保存先のフォルダ、URLテキストを出力する
-# - getParseDataFromURL.py
-#   - URLからPDFファイルを読み込み、パースした情報を取得する 
+#   - URLテキスト(json)を出力する
+# - getPDF.py
+#   - URLテキストからPDFを出力する
+# - getParseDataFromPDF.py
+#   - PDFファイルを読み込み、パースした情報を取得する
+# 
+# ## URLテキスト(json)の形式
+# 
+# - name : PDFファイル名
+# - url : 取得元のURL
+# - isGetPDF : PDFファイルを取得している場合はTrue
+# 
+# ### name
+# 
+# 
 
 # ## import
 
-# In[1]:
+# In[11]:
 
 
 import os
+import json
 from bs4 import BeautifulSoup
 from WebScrapingTool import Base_UserFunction as uf
 
@@ -42,25 +55,74 @@ class debug:
 
 # ## 基本パーツ
 
-# In[2]:
+# In[9]:
 
 
 class base:
+    saveFolder = ''
+    saveFileName = ''
     baseURL = ''
     topURL = ''
     previousPDFLinkURL = ''
-    saveFolder = ''
-    saveFileName = ''
-    saveData = list()
+    prefixLast = ''
+    prefixPrevious = ''
     
-    # コンストラクタ
-    def __init__(self, _folder, _fileName, _url, _top, _previousPdfUrl):
-        self.baseURL = _url
-        self.topURL = _top
-        self.previousPDFLinkURL = _previousPdfUrl
-        self.saveFolder = _folder
-        self.saveFileName = _fileName
+    saveData = list()
 
+    # コンストラクタ
+    def __init__(self):
+        pass
+    
+    def setSettingData(self):
+        #設定ファイルから必要な情報を取得する
+        #タグ
+        tag_debug = '[a]'
+        tag_saveFolder = '[b]'
+        tag_saveFileName = '[c]'
+        tag_baseURL = '[d]'
+        tag_topURL = '[e]'
+        tag_previousPDFLinkURL = '[f]'
+        tag_prefixLast = '[g]'
+        tag_prefixPrevious = '[h]'
+
+        isDebug = False
+
+        try:
+            with open('_Setting.txt', mode='r') as f:
+                lines = f.readlines()
+                for l in lines:
+                    if l.startswith(tag_debug, 0, 3):
+                        if (l.replace(tag_debug, '').rstrip()).lower() == 'true':
+                            isDebug = True
+                        else:
+                            isDebug = False                    
+
+                    if l.startswith(tag_saveFolder, 0, 3):
+                        self.saveFolder = l.replace(tag_saveFolder, '').rstrip()
+
+                    if l.startswith(tag_saveFileName, 0, 3):
+                        self.saveFileName = l.replace(tag_saveFileName, '').rstrip()
+
+                    if l.startswith(tag_baseURL, 0, 3):
+                        self.baseURL = l.replace(tag_baseURL, '').rstrip()
+
+                    if l.startswith(tag_topURL, 0, 3):
+                        self.topURL = l.replace(tag_topURL, '').rstrip()
+
+                    if l.startswith(tag_previousPDFLinkURL, 0, 3):
+                        self.previousPDFLinkURL = l.replace(tag_previousPDFLinkURL, '').rstrip()
+
+                    if l.startswith(tag_prefixLast, 0, 3):
+                        self.prefixLast = l.replace(tag_prefixLast, '').rstrip()
+
+                    if l.startswith(tag_prefixPrevious, 0, 3):
+                        self.prefixPrevious = l.replace(tag_prefixPrevious, '').rstrip()
+
+        except:
+            print('[!!!ERROR!!!] Read Setting Text')
+                
+        return isDebug
+        
     def checkInitialize(self):
         if len(self.saveFolder) <= 0:
             print('[!!!ERROR!!!] Save FolderName is Empty!')
@@ -74,8 +136,8 @@ class base:
         if not os.path.exists(self.saveFolder):
             os.mkdir(self.saveFolder)
 
-    def getBaseURL(self):
-        return self.baseURL, self.topURL, self.previousPDFLinkURL
+    def getSettingData(self):
+        return self.baseURL, self.topURL, self.previousPDFLinkURL, self.prefixLast, self.prefixPrevious
     
     def setSaveData(self, _data):
         self.saveData.append(_data)
@@ -86,12 +148,23 @@ class base:
             print('No Data...')
             return
         
-        #テキスト作成
-        _t = uf.getNowTime()
+        # リスト作成
         oFile = self.saveFolder + '/' + self.saveFileName
+
+        # 重複データは再度追加しない
+        _alreadyGetURL = list()
+        with open(oFile, mode='r') as fs:
+            for line in fs:
+                j = json.loads(line)
+                _alreadyGetURL.append(j['url'])
+                
         with open(oFile, mode='a') as fs:
-            for l in self.saveData:
-                uf.fileWrite(fs, l)
+            for line in self.saveData:
+                j = json.loads(line)
+                if not j['url'] in _alreadyGetURL:
+                    uf.fileWrite(fs, line)
+                else:
+                    print('already get url : ' + line)
             
         uf.fileDataSlim(oFile)    
     
@@ -99,19 +172,40 @@ class base:
 
 # ## スクレイピング本体
 
-# In[8]:
+# In[13]:
 
 
 class work:
+    baseURL = ''
+    topURL = ''
+    previousPDFLinkURL = ''
+    prefixLast = ''
+    prefixPrevious = ''    
     PDFPath = ''
     #コンストラクタ
-    def __init__(self):
+    def __init__(self, b):
         self.PDFPath = '<p class="pagelinkout">'
+        self.baseURL, self.topURL, self.previousPDFLinkURL, self.prefixLast, self.prefixPrevious = b.getSettingData()
 
+    def setSaveData(self, url, isLast):
+        name = url.replace("/tosei", "")
+        name = name.replace("/hodohappyo", "")
+        name = name.replace("/press", "")
+        name = name.replace("/documents", "_")
+        name = name.replace("/", "")
+        fullURL = ''
+        if isLast:
+            name = self.prefixLast + name
+            fullURL = self.baseURL + '/hodo/saishin/' + url
+        else:
+            name = self.prefixPrevious + name
+            fullURL = self.previousPDFLinkURL + url 
+        _saveData = '{ "name" : "' + name + '", "url" : "' + fullURL + '", "isGetPDF" : "False" }\n'
+        
+        return _saveData
         
     def getURLandSetData(self, d, b):
-        _baseUrl, _topUrl, _previousPDFLinkURL = b.getBaseURL()
-        _html = uf.getHTML(_baseUrl + _topUrl)
+        _html = uf.getHTML(self.baseURL + self.topURL)
         bs = uf.getBS4(_html)
         #d.printLog(bs.body)
 
@@ -122,7 +216,7 @@ class work:
             # last Data
             _bsLinkLastPath = _linkList.find("a", {"class": "innerLink"})
             if _bsLinkLastPath is not None:
-                _linkLastPath = _baseUrl + _bsLinkLastPath["href"]
+                _linkLastPath = self.baseURL + _bsLinkLastPath["href"]
 
             # previous Data
             _bsLinkPath = _linkList.find("a", {"class": "externalLink"})
@@ -137,30 +231,25 @@ class work:
             return False
 
         # Last PDF Link
-        print("get Last PDF Link")
+        print("[get Last PDF Link]")
         print(_linkLastPath)
         _html = uf.getHTML(_linkLastPath)
         bs = uf.getBS4(_html)
         _bsPDFPathList = bs.findAll("a", {"class":"resourceLink newWindow"})
+        isLast = True
         for _url in _bsPDFPathList:
-            print(_url["href"])
-            name = _url["href"].replace("/", "")
-            saveData = '{ "name" : "' + name + '", "url" : "' + _baseUrl + '/hodo/saishin/' + _url["href"] + '"}\n'
-            b.setSaveData(saveData)
+            b.setSaveData(self.setSaveData(_url["href"], isLast))
         
         # previous PDF Link
-        print("get Previous PDF Link")
+        print("[get Previous PDF Link]")
         for _link in _linkPrevPath:
             print(_link)
             _html = uf.getHTML(_link)
             bs = uf.getBS4(_html)
             _bsPDFPathList = bs.findAll("a", {"class":"icon_pdf"})
-            
+            isLast = False
             for _url in _bsPDFPathList:
-                print(_url["href"])
-                name = _url["href"].replace("/", "")
-                saveData = '{ "name" : "' + name + '", "url" : "' + _previousPDFLinkURL + _url["href"] + '"}\n'
-                b.setSaveData(saveData)
+                b.setSaveData(self.setSaveData(_url["href"], isLast))
         
         return True
 
@@ -173,58 +262,15 @@ class work:
 def main():  
     print("\n[Start]" + uf.getNowTime() + '\n')            
 
-    #設定ファイルから必要な情報を取得する
-    #タグ
-    tag_debug = '[a]'
-    tag_saveFolder = '[b]'
-    tag_saveFileName = '[c]'
-    tag_baseURL = '[d]'
-    tag_topURL = '[e]'
-    tag_previousPDFLinkURL = '[f]'
-    
-    isDebug = False
-    _saveFolder = ''
-    _saveFileName = ''
-    _baseURL = ''
-    _topURL = ''
-    _previousPDFLinkURL = ''
-
-    try:
-        with open('_Setting.txt', mode='r') as f:
-            lines = f.readlines()
-            for l in lines:
-                if l.startswith(tag_debug, 0, 3):
-                    if (l.replace(tag_debug, '').rstrip()).lower() == 'true':
-                        isDebug = True
-                    else:
-                        isDebug = False                    
-
-                if l.startswith(tag_saveFolder, 0, 3):
-                    _saveFolder = l.replace(tag_saveFolder, '').rstrip()
-             
-                if l.startswith(tag_saveFileName, 0, 3):
-                    _saveFileName = l.replace(tag_saveFileName, '').rstrip()
-             
-                if l.startswith(tag_baseURL, 0, 3):
-                    _baseURL = l.replace(tag_baseURL, '').rstrip()
-                    
-                if l.startswith(tag_topURL, 0, 3):
-                    _topURL = l.replace(tag_topURL, '').rstrip()
-
-                if l.startswith(tag_previousPDFLinkURL, 0, 3):
-                    _previousPDFLinkURL = l.replace(tag_previousPDFLinkURL, '').rstrip()
-                    
-    except:
-        print('[!!!ERROR!!!] Read Setting Text')
-        return    
-
-    b = base(_saveFolder, _saveFileName, _baseURL, _topURL, _previousPDFLinkURL)
+    b = base()
+    isDebug = b.setSettingData()
     if not b.checkInitialize():
         return
-    w = work()
-
+    
     #デバッグの設定
     d = debug(isDebug)
+
+    w = work(b)
     
     #保存フォルダ作成
     b.createSaveFolder()
@@ -239,7 +285,7 @@ def main():
 
 # ## 処理開始
 
-# In[9]:
+# In[16]:
 
 
 if __name__ == '__main__':
