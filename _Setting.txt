@@ -20,3 +20,5 @@
 [g]Last
 #Type for previousData
 [h]Previous
+#urlList Format
+[i]{"type" : "@@type", "name" : "@@name", "url" : "@@url", "isGetPDF" : "False" }

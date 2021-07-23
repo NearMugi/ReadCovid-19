@@ -31,7 +31,7 @@
 
 # ## import
 
-# In[11]:
+# In[1]:
 
 
 import os
@@ -82,8 +82,8 @@ class base:
         tag_baseURL = '[d]'
         tag_topURL = '[e]'
         tag_previousPDFLinkURL = '[f]'
-        tag_prefixLast = '[g]'
-        tag_prefixPrevious = '[h]'
+        tag_typeLast = '[g]'
+        tag_typePrevious = '[h]'
 
         isDebug = False
 
@@ -112,11 +112,11 @@ class base:
                     if l.startswith(tag_previousPDFLinkURL, 0, 3):
                         self.previousPDFLinkURL = l.replace(tag_previousPDFLinkURL, '').rstrip()
 
-                    if l.startswith(tag_prefixLast, 0, 3):
-                        self.prefixLast = l.replace(tag_prefixLast, '').rstrip()
+                    if l.startswith(tag_typeLast, 0, 3):
+                        self.prefixLast = l.replace(tag_typeLast, '').rstrip()
 
-                    if l.startswith(tag_prefixPrevious, 0, 3):
-                        self.prefixPrevious = l.replace(tag_prefixPrevious, '').rstrip()
+                    if l.startswith(tag_typePrevious, 0, 3):
+                        self.prefixPrevious = l.replace(tag_typePrevious, '').rstrip()
 
         except:
             print('[!!!ERROR!!!] Read Setting Text')
@@ -194,13 +194,14 @@ class work:
         name = name.replace("/documents", "_")
         name = name.replace("/", "")
         fullURL = ''
+        type = ''
         if isLast:
-            name = self.prefixLast + name
+            type = self.prefixLast
             fullURL = self.baseURL + '/hodo/saishin/' + url
         else:
-            name = self.prefixPrevious + name
+            type = self.prefixPrevious
             fullURL = self.previousPDFLinkURL + url 
-        _saveData = '{ "name" : "' + name + '", "url" : "' + fullURL + '", "isGetPDF" : "False" }\n'
+        _saveData = '{"type" : "' + type + '", name" : "' + name + '", "url" : "' + fullURL + '", "isGetPDF" : "False" }\n'
         
         return _saveData
         
