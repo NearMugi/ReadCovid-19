@@ -21,4 +21,4 @@
 #Type for previousData
 [h]Previous
 #urlList Format
-[i]{"type" : "@@type", "name" : "@@name", "url" : "@@url", "isGetPDF" : "False" }
+[i]{"type" : "@@type", "name" : "@@name", "url" : "@@url", "isGetPDF" : "False", "isParse" : "False" }
