@@ -22,3 +22,5 @@
 [h]Previous
 #urlList Format
 [i]{"type" : "@@type", "name" : "@@name", "url" : "@@url", "isGetPDF" : "False", "isParse" : "False" }
+#Save fileName(including extension)
+[j]parseList.csv
