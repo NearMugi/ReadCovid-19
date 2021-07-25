@@ -23,4 +23,10 @@
 #urlList Format
 [i]{"type" : "@@type", "name" : "@@name", "url" : "@@url", "isGetPDF" : "False", "isParse" : "False" }
 #Save fileName(including extension)
-[j]parseList.csv
+[j]parsePDF.json
+#Save fileName(including extension)
+[k]outputList.csv
+#Previous URL
+[l]https://www.metro.tokyo.lg.jp/tosei/hodohappyo/press/YYYY/MM/DD/NN.html
+#Save fileName(Previous URL)(including extension)
+[m]prevPressURL.json
