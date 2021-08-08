@@ -30,3 +30,5 @@
 [l]https://www.metro.tokyo.lg.jp/tosei/hodohappyo/press/YYYY/MM/DD/NN.html
 #Save fileName(Previous URL)(including extension)
 [m]prevPressURL.txt
+#Log
+[o]parse.log
