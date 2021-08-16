@@ -4,16 +4,10 @@
 # In[1]:
 
 
-import sys
 import os
-import shutil
-import requests
 from WebScrapingTool import Base_UserFunction as uf
-from WebScrapingTool import Base_GetHtmlList as _gethtml
-import glob
 import json
 import urllib
-import time
 
 
 # In[2]:
@@ -24,10 +18,12 @@ def getPDF(url, savePath, fn):
     try:
         urllib.request.urlretrieve(url, savePath)
     except:
-        print('ERROR  url: ' + url)    
+        print('ERROR  url: ' + url)
+        return False
+    return True    
 
 
-# In[4]:
+# In[3]:
 
 
 def main():
@@ -71,21 +67,32 @@ def main():
     baseText =_saveFolder + "/" + _saveFileName
     print(baseText)
     
-    #ファイルを開く
+    # ファイルを開く
+    updateList = list()
     with open(baseText, mode='r') as f:
         cnt = 0
         for line in f:
-            URL = line
-            di = json.loads(line)
-            print(di)
-            URL = di['url']
-            fileName = di['name']
-            getPDF(URL, _saveFolder, fileName)
-            cnt += 1
-            print("...Access ImageURL : " + URL + '  ' + str(cnt))
+            l = line
+            j = json.loads(line)
+            URL = j['url']
+            fileName = j['name']
+            isGetPDF = j['isGetPDF']
+            if isGetPDF == "False":
+                if getPDF(URL, _saveFolder, fileName):
+                    cnt += 1
+                    print("...Access ImageURL : " + URL + '  ' + str(cnt))
+                    l = l.replace('"isGetPDF" : "False"', '"isGetPDF" : "True"')
+            updateList.append(l)
+
         print('\n...Get Size :' + str(cnt) + '\n')
 
-    
+    # ファイル更新
+    with open(baseText, mode='w') as f:
+        for line in updateList:
+                uf.fileWrite(f, line)
+    # 重複データ削除
+    uf.fileDataSlim(baseText) 
+
     print("\n[ End ]"  + uf.getNowTime() + '\n')
     
     

@@ -31,12 +31,11 @@
 
 # ## import
 
-# In[1]:
+# In[6]:
 
 
 import os
 import json
-from bs4 import BeautifulSoup
 from WebScrapingTool import Base_UserFunction as uf
 
 #デバッグモードの指定
@@ -55,7 +54,7 @@ class debug:
 
 # ## 基本パーツ
 
-# In[9]:
+# In[7]:
 
 
 class base:
@@ -64,9 +63,12 @@ class base:
     baseURL = ''
     topURL = ''
     previousPDFLinkURL = ''
-    prefixLast = ''
-    prefixPrevious = ''
-    
+    typeLast = ''
+    typePrevious = ''
+    dataFormat = ''
+    prevPressURLFileName = ''
+
+    prevPressURL = list()
     saveData = list()
 
     # コンストラクタ
@@ -84,7 +86,8 @@ class base:
         tag_previousPDFLinkURL = '[f]'
         tag_typeLast = '[g]'
         tag_typePrevious = '[h]'
-
+        tag_dataFormat = '[i]'
+        tag_prevPressURL = '[m]'
         isDebug = False
 
         try:
@@ -113,14 +116,27 @@ class base:
                         self.previousPDFLinkURL = l.replace(tag_previousPDFLinkURL, '').rstrip()
 
                     if l.startswith(tag_typeLast, 0, 3):
-                        self.prefixLast = l.replace(tag_typeLast, '').rstrip()
+                        self.typeLast = l.replace(tag_typeLast, '').rstrip()
 
                     if l.startswith(tag_typePrevious, 0, 3):
-                        self.prefixPrevious = l.replace(tag_typePrevious, '').rstrip()
+                        self.typePrevious = l.replace(tag_typePrevious, '').rstrip()
+
+                    if l.startswith(tag_dataFormat, 0, 3):
+                        self.dataFormat = l.replace(tag_dataFormat, '').rstrip()
+
+                    if l.startswith(tag_prevPressURL, 0, 3):
+                        self.prevPressURLFileName = l.replace(tag_prevPressURL, '').rstrip()
 
         except:
             print('[!!!ERROR!!!] Read Setting Text')
-                
+
+        # 過去プレスリスト作成
+#        iFile = self.saveFolder + '/' + self.prevPressURLFileName
+#        with open(iFile, mode='r') as fs:
+#            for line in fs:
+#                self.prevPressURL.append(line)
+
+
         return isDebug
         
     def checkInitialize(self):
@@ -132,13 +148,21 @@ class base:
             return False    
         return True        
         
-    def createSaveFolder(self):
+    def createSaveFolderAndFile(self):
         if not os.path.exists(self.saveFolder):
             os.mkdir(self.saveFolder)
+        oFile = self.saveFolder + '/' + self.saveFileName
+        if not os.path.exists(oFile):
+            f = open(oFile,'w')
+            f.close()
+
 
     def getSettingData(self):
-        return self.baseURL, self.topURL, self.previousPDFLinkURL, self.prefixLast, self.prefixPrevious
-    
+        return self.baseURL, self.topURL, self.previousPDFLinkURL, self.typeLast, self.typePrevious, self.dataFormat
+
+    def getPrevURL(self):
+        return self.prevPressURL
+
     def setSaveData(self, _data):
         self.saveData.append(_data)
         
@@ -165,27 +189,28 @@ class base:
                     uf.fileWrite(fs, line)
                 else:
                     print('already get url : ' + line)
-            
+        # 重複データ削除    
         uf.fileDataSlim(oFile)    
     
 
 
 # ## スクレイピング本体
 
-# In[13]:
+# In[8]:
 
 
 class work:
     baseURL = ''
     topURL = ''
     previousPDFLinkURL = ''
-    prefixLast = ''
-    prefixPrevious = ''    
+    typeLast = ''
+    typePrevious = ''    
     PDFPath = ''
+    dataFormat = ''
     #コンストラクタ
     def __init__(self, b):
         self.PDFPath = '<p class="pagelinkout">'
-        self.baseURL, self.topURL, self.previousPDFLinkURL, self.prefixLast, self.prefixPrevious = b.getSettingData()
+        self.baseURL, self.topURL, self.previousPDFLinkURL, self.typeLast, self.typePrevious, self.dataFormat = b.getSettingData()
 
     def setSaveData(self, url, isLast):
         name = url.replace("/tosei", "")
@@ -196,13 +221,16 @@ class work:
         fullURL = ''
         type = ''
         if isLast:
-            type = self.prefixLast
+            type = self.typeLast
             fullURL = self.baseURL + '/hodo/saishin/' + url
         else:
-            type = self.prefixPrevious
+            type = self.typePrevious
             fullURL = self.previousPDFLinkURL + url 
-        _saveData = '{"type" : "' + type + '", name" : "' + name + '", "url" : "' + fullURL + '", "isGetPDF" : "False" }\n'
-        
+
+        _saveData = self.dataFormat + '\n'
+        _saveData = _saveData.replace("@@type", type)
+        _saveData = _saveData.replace("@@name", name)
+        _saveData = _saveData.replace("@@url", fullURL)
         return _saveData
         
     def getURLandSetData(self, d, b):
@@ -211,7 +239,7 @@ class work:
         #d.printLog(bs.body)
 
         _linkLastPath = ""
-        _linkPrevPath = list()
+        _linkPrevPath = b.getPrevURL()
         _bsLinkPathList = bs.findAll("p", {"class": "pagelinkout"})
         for _linkList in _bsLinkPathList:
             # last Data
@@ -257,7 +285,7 @@ class work:
 
 # ## 最初に呼ばれる
 
-# In[4]:
+# In[9]:
 
 
 def main():  
@@ -268,13 +296,13 @@ def main():
     if not b.checkInitialize():
         return
     
-    #デバッグの設定
+    # デバッグの設定
     d = debug(isDebug)
 
     w = work(b)
     
-    #保存フォルダ作成
-    b.createSaveFolder()
+    # 保存フォルダ,ファイル作成
+    b.createSaveFolderAndFile()
     
     w.getURLandSetData(d, b)
     b.saveGetData()
@@ -286,7 +314,7 @@ def main():
 
 # ## 処理開始
 
-# In[16]:
+# In[10]:
 
 
 if __name__ == '__main__':
