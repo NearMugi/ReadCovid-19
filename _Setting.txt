@@ -6,8 +6,10 @@
 
 #Debug True / False
 [a]True
-#Save folder
-[b]#data
+#Save Setting Folder
+[b]#list
+#Save Folder
+[B]#data
 #Save fileName(including extension)
 [c]dataList.json
 #Base URL
@@ -31,4 +33,4 @@
 #Save fileName(Previous URL)(including extension)
 [m]prevPressURL.txt
 #Log
-[o]parse.log
+[o]parse_DATE.log
