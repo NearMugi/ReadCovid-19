@@ -34,10 +34,12 @@ def main():
     #タグ
     tag_debug = '[a]'
     tag_saveFolder = '[b]'
+    tag_savePDFFolder = '[B]'
     tag_saveFileName = '[c]'
     
     isDebug = False
     _saveFolder = ''
+    _savePDFFolder = ''
     _saveFileName = ''
     
     try:
@@ -55,6 +57,9 @@ def main():
              
                 if l.startswith(tag_saveFileName, 0, 3):
                     _saveFileName = l.replace(tag_saveFileName, '').rstrip()
+             
+                if l.startswith(tag_savePDFFolder, 0, 3):
+                    _savePDFFolder = l.replace(tag_savePDFFolder, '').rstrip()
              
     except:
         print('[!!!ERROR!!!] Read Setting.text')
@@ -78,7 +83,7 @@ def main():
             fileName = j['name']
             isGetPDF = j['isGetPDF']
             if isGetPDF == "False":
-                if getPDF(URL, _saveFolder, fileName):
+                if getPDF(URL, _savePDFFolder, fileName):
                     cnt += 1
                     print("...Access ImageURL : " + URL + '  ' + str(cnt))
                     l = l.replace('"isGetPDF" : "False"', '"isGetPDF" : "True"')

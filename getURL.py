@@ -31,7 +31,7 @@
 
 # ## import
 
-# In[6]:
+# In[1]:
 
 
 import os
@@ -54,7 +54,7 @@ class debug:
 
 # ## 基本パーツ
 
-# In[7]:
+# In[2]:
 
 
 class base:
@@ -196,7 +196,7 @@ class base:
 
 # ## スクレイピング本体
 
-# In[8]:
+# In[3]:
 
 
 class work:
@@ -285,7 +285,7 @@ class work:
 
 # ## 最初に呼ばれる
 
-# In[9]:
+# In[4]:
 
 
 def main():  
@@ -314,7 +314,7 @@ def main():
 
 # ## 処理開始
 
-# In[10]:
+# In[5]:
 
 
 if __name__ == '__main__':

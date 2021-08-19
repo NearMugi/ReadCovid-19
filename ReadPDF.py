@@ -3,8 +3,16 @@
 
 # https://www.fukushihoken.metro.tokyo.lg.jp/hodo/saishin/hassei.html
 # 
+# # TODO
+# * PDFを読み込むとき、数字がくっついてしまうときがある  
+# 20210731  20210801_0801-01-01.pdf  
+# 20210814  
+# -> char_margin = 1.0 としてみた(デフォは2.0)
+# 
+# * データ数が多い日がある(年代別かも)  
+# -> 取得するデータ数を固定にした
 
-# In[ ]:
+# In[1]:
 
 
 import os
@@ -13,7 +21,7 @@ import json
 import urllib
 
 
-# In[ ]:
+# In[2]:
 
 
 # https://www.shibutan-bloomers.com/python_library_pdfminer-six/2124/#21PDFJupyterNotebook
@@ -64,9 +72,9 @@ def readPDF(filePath, type):
         document = PDFDocument(parser)
         if not document.is_extractable:
             raise PDFTextExtractionNotAllowed
-        # https://pdfminersix.readthedocs.io/en/latest/api/composable.html#
         laparams = LAParams(
-            all_texts=True,
+            char_margin = 1.0,
+            all_texts = True,
         )
         rsrcmgr = PDFResourceManager()
         device = PDFPageAggregator(rsrcmgr, laparams=laparams)
@@ -130,19 +138,19 @@ def readPDF(filePath, type):
 
 def parse(filePath, type):
 #    print("parse start : " + filePath)
-    getText = ''
     try:
         pdfList = readPDF(filePath, type)
         #print(pdfList)
     except:
         return "file open error... : " + filePath, False
-
+    
     modeSokuhouHeader = '別紙'
     modeAddHeader = '【追加情報】'
+    typeAge = 'age'
     typeSeriouslyIll = 'seriouslyIll'
     # keyword, output Keyword
     modeSokuhou = (
-        ['10歳未満', 'age'],
+        ['10歳未満', typeAge],
         ['【参考】　重症者の属性', typeSeriouslyIll]
     )
 
@@ -150,22 +158,16 @@ def parse(filePath, type):
         ['重症者の属性', typeSeriouslyIll],
     )
 
-    modeSokuhouSize = 22
-    modeAddSize = 10
-
     isAdd = False
     mode = list()
-    outputSize = 0
     for l in pdfList:
         text = l['text']
         if modeSokuhouHeader in text:
             mode = copy.deepcopy(modeSokuhou)
-            outputSize = modeSokuhouSize
             break
         elif modeAddHeader in text:
             isAdd = True
             mode = copy.deepcopy(modeAdd)
-            outputSize = modeAddSize
             break
 
     if len(mode) <= 0:
@@ -187,7 +189,7 @@ def parse(filePath, type):
         return "missing Date... : " + filePath, False
 
     tmpDict = dict()
-    seriouslyIllHeader = ''
+    tmpHeader = ''
     for m in mode:
         w = m[0]
         type = m[1]
@@ -212,38 +214,65 @@ def parse(filePath, type):
                         isFindNumber = True
                     else:
                         # ヘッダーを一時保存(PDFごとに列数が異なるため)
-                        if type == typeSeriouslyIll:
+                        if type == typeAge:
+                            tmpHeader = text                        
+
+                        elif type == typeSeriouslyIll:
                             if not w in text:
-                                seriouslyIllHeader = text                        
+                                tmpHeader = text                        
 
             # 数字を取得、文字が出てきたら終了
             if isFindNumber:
+                # 年代別を取得するとき、以下の通り分割する
+                # 10歳未満, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 不明
+                if type == typeAge:
+                    tmpList = text.split(SPLITWORD)
+                    tmpHeader = tmpHeader.replace('10歳未満', 'mi')
+                    tmpHeader = tmpHeader.replace('100歳以上', 'hu')
+                    tmpHeader = tmpHeader.replace('不明', 'un')
+                    tmpHeader = tmpHeader.replace('代', '')
+                    tmpHeader = tmpHeader.replace(SPLITWORD, '')
+
+                    idx = 0
+                    keyList = ['mi', '10', '20', '30', '40', '50', '60', '70', '80', '90', 'hu', 'un']
+                    for key in keyList:
+                        if tmpHeader[0:2] == key:
+                            tmpGetList.append(tmpList[idx])
+                            idx += 1
+                            tmpHeader = tmpHeader[2:]
+                        else:
+                            tmpGetList.append('0')
+                    # データは1行しかないので、必ず終了
+                    isEnd = True
+
                 # 重症者を取得するとき、以下の通り分割する
                 # 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 確認中, 男, 女, 確認中
-                if type == typeSeriouslyIll:
+                elif type == typeSeriouslyIll:
                     tmpList = text.split(SPLITWORD)
-                    seriouslyIllHeader = seriouslyIllHeader.replace('100', 'hu')
-                    seriouslyIllHeader = seriouslyIllHeader.replace('確認中', 'un')
-                    seriouslyIllHeader = seriouslyIllHeader.replace('男', 'ma')
-                    seriouslyIllHeader = seriouslyIllHeader.replace('女', 'fe')
-                    seriouslyIllHeader = seriouslyIllHeader.replace('代', '')
-                    seriouslyIllHeader = seriouslyIllHeader.replace(SPLITWORD, '')
+                    tmpHeader = tmpHeader.replace('100', 'hu')
+                    tmpHeader = tmpHeader.replace('確認中', 'un')
+                    tmpHeader = tmpHeader.replace('男', 'ma')
+                    tmpHeader = tmpHeader.replace('女', 'fe')
+                    tmpHeader = tmpHeader.replace('代', '')
+                    tmpHeader = tmpHeader.replace(SPLITWORD, '')
                     idx = 0
                     keyList = ['10', '20', '30', '40', '50', '60', '70', '80', '90', 'hu', 'un', 'ma', 'fe', 'un']
                     for key in keyList:
-                        if seriouslyIllHeader[0:2] == key:
+                        if tmpHeader[0:2] == key:
                             tmpGetList.append(tmpList[idx])
                             idx += 1
-                            seriouslyIllHeader = seriouslyIllHeader[2:]
+                            tmpHeader = tmpHeader[2:]
                         else:
                             tmpGetList.append('0')
 
-                    #print(seriouslyIllHeader)
+                    #print(tmpHeader)
                     #print(tmpList)
                     #print(tmpGetList)
                     
                     # データは1行しかないので、必ず終了
                     isEnd = True
+                
+                # 今のところここは通らない
                 else:
                     tmpList = text.split(SPLITWORD)
                     for tmp in tmpList:
@@ -281,12 +310,14 @@ def main():
     #タグ
     tag_debug = '[a]'
     tag_saveFolder = '[b]'
+    tag_loadPDFFolder = '[B]'
     tag_loadFileName = '[c]'
     tag_saveFileName = '[j]'
     tag_parseLogName = '[o]'
     
     isDebug = False
     _saveFolder = ''
+    _loadPDFFolder = ''
     _loadFileName = ''
     _saveFileName = ''
     _parseLogName = ''
@@ -303,6 +334,9 @@ def main():
 
                 if l.startswith(tag_saveFolder, 0, 3):
                     _saveFolder = l.replace(tag_saveFolder, '').rstrip()
+             
+                if l.startswith(tag_loadPDFFolder, 0, 3):
+                    _loadPDFFolder = l.replace(tag_loadPDFFolder, '').rstrip()
              
                 if l.startswith(tag_loadFileName, 0, 3):
                     _loadFileName = l.replace(tag_loadFileName, '').rstrip()
@@ -327,6 +361,7 @@ def main():
     saveFile =_saveFolder + "/" + _saveFileName
     print(saveFile)
     
+    _parseLogName = _parseLogName.replace('DATE', uf.getNowTime())
     logFile =_saveFolder + "/" + _parseLogName
     print(logFile)
     
@@ -345,7 +380,7 @@ def main():
             fileName = j['name']
             isParse = j['isParse']
             if isParse == "False":
-                _data, isGet = parse(_saveFolder + "/" + fileName, type)
+                _data, isGet = parse(_loadPDFFolder + "/" + fileName, type)
                 with open(logFile, mode='a') as flog:
                     uf.fileWrite(flog, uf.getNowTime() + "\t" + fileName + "\t" + _data  + '\n')                 
                 if not isGet:
