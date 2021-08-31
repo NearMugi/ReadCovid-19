@@ -7,9 +7,9 @@
 #Debug True / False
 [a]True
 #Save Setting Folder
-[b]#list
+[b]list
 #Save Folder
-[B]#data
+[B]data
 #Save fileName(including extension)
 [c]dataList.json
 #Base URL
