@@ -1,0 +1,37 @@
+#Setting File
+
+#[n]:TAG
+#Write in the 0 Column
+#If you move the Column, it will be commented out.
+
+#Debug True / False
+[a]True
+#Save Setting Folder
+[b]list
+#Save Folder
+[B]data
+#Save fileName(including extension)
+[c]dataList.json
+#Base URL
+[d]https://www.fukushihoken.metro.tokyo.lg.jp
+#Top URL
+[e]/hodo/saishin/hassei.html
+#Base URL(previous PDF link)
+[f]https://www.metro.tokyo.lg.jp
+#Type for LastData
+[g]Last
+#Type for previousData
+[h]Previous
+#urlList Format
+[i]{"type" : "@@type", "name" : "@@name", "url" : "@@url", "isGetPDF" : "False", "isParse" : "False" }
+#Save fileName(including extension)
+[j]parsePDF.json
+#Save fileName(including extension)
+[k]outputList.csv
+#Previous URL
+[l]https://www.metro.tokyo.lg.jp/tosei/hodohappyo/press/YYYY/MM/DD/NN.html
+#Save fileName(Previous URL)(including extension)
+[m]prevPressURL.txt
+#Log
+[o]parse_DATE.log
+

@@ -130,4 +130,5 @@ dmypy.json
 
 
 *.pdf
-node-red/credential_GCS.json
+credential_GCS.json
+flows_cred.json
