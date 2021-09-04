@@ -1,24 +1,21 @@
-#!/usr/bin/env python
-# coding: utf-8
-
+# To add a new cell, type '# %%'
+# To add a new markdown cell, type '# %% [markdown]'
+# %% [markdown]
 # # Settingファイルの値を出力する
 # 
-
+# %% [markdown]
 # ## import
 
-# In[1]:
-
-
+# %%
 import sys
 import os
+import json
 from WebScrapingTool import Base_UserFunction as uf
 
-
+# %% [markdown]
 # ## Settingファイルからフォルダ名・ファイル名を取得する
 
-# In[2]:
-
-
+# %%
 class readSettingFile:
     # コンストラクタ
     def __init__(self):
@@ -36,9 +33,13 @@ class readSettingFile:
         tag_logName = '[o]'
         
         # カレントディレクトリ取得
-#        currentDir = os.path.dirname(os.path.abspath("__file__")) + '/'
-        currentDir = os.path.dirname(__file__) + '/'
-        print(currentDir)
+        currentDir = '/'
+        try:
+            # Node-RED から呼び出し
+            currentDir = os.path.dirname(__file__) + '/'
+        except:
+            # jupyterNotebook から呼び出し
+            currentDir = os.path.dirname(os.path.abspath("__file__")) + '/'
         retDict = dict()
 
         try:
@@ -62,31 +63,18 @@ class readSettingFile:
 
         except:
             print('[!!!ERROR!!!] Read Setting Text')
+            return retDict, 1
 
-        return retDict    
+        return retDict, 0
 
-
-# ## 最初に呼ばれる
-
-# In[3]:
-
-
-def main():  
-    print("\n[Start]" + uf.getNowTime() + '\n')            
-
-    read = readSettingFile()
-    
-    print("\n[ End ]" + uf.getNowTime() + '\n')
-    
-    return read.getSettingData()
-
-
+# %% [markdown]
 # ## 処理開始
 
-# In[4]:
-
-
+# %%
 if __name__ == '__main__':
-    ret = main()
-    sys.exit(ret)
+    read = readSettingFile()
+    ret, isError = read.getSettingData()
+    print(json.dumps(ret))
+    sys.exit(isError)   
+
 
