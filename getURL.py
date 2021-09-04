@@ -91,7 +91,7 @@ class base:
         isDebug = False
         
         # カレントディレクトリ取得
-        currentDir = os.path.dirname(__file__) + '/'
+        currentDir = os.path.dirname(os.path.abspath("__file__")) + '/'
         print(currentDir)
         
         try:

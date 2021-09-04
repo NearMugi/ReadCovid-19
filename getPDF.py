@@ -41,9 +41,13 @@ def main():
     _saveFolder = ''
     _savePDFFolder = ''
     _saveFileName = ''
-    
+
+    # カレントディレクトリ取得
+    currentDir = os.path.dirname(os.path.abspath("__file__")) + '/'
+    print(currentDir)
+
     try:
-        with open('_Setting.txt', mode='r') as f:
+        with open(currentDir + '_Setting.txt', mode='r') as f:
             lines = f.readlines()
             for l in lines:
                 if l.startswith(tag_debug, 0, 3):
@@ -53,13 +57,13 @@ def main():
                         isDebug = False                    
 
                 if l.startswith(tag_saveFolder, 0, 3):
-                    _saveFolder = l.replace(tag_saveFolder, '').rstrip()
+                    _saveFolder = currentDir + l.replace(tag_saveFolder, '').rstrip()
              
                 if l.startswith(tag_saveFileName, 0, 3):
                     _saveFileName = l.replace(tag_saveFileName, '').rstrip()
              
                 if l.startswith(tag_savePDFFolder, 0, 3):
-                    _savePDFFolder = l.replace(tag_savePDFFolder, '').rstrip()
+                    _savePDFFolder = currentDir + l.replace(tag_savePDFFolder, '').rstrip()
              
     except:
         print('[!!!ERROR!!!] Read Setting.text')
