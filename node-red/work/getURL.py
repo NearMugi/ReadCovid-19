@@ -1,6 +1,6 @@
-#!/usr/bin/env python
-# coding: utf-8
-
+# To add a new cell, type '# %%'
+# To add a new markdown cell, type '# %% [markdown]'
+# %% [markdown]
 # # 東京都福祉保健局のHPから新型コロナウイルスに関連した患者の発生について（過去1週間分）のPDFのURLをテキストに出力  
 #   
 # ## 仕様  
@@ -28,12 +28,10 @@
 # ### name
 # 
 # 
-
+# %% [markdown]
 # ## import
 
-# In[1]:
-
-
+# %%
 import os
 import json
 from WebScrapingTool import Base_UserFunction as uf
@@ -51,12 +49,10 @@ class debug:
         if DEBUG:
             print(msg)
 
-
+# %% [markdown]
 # ## 基本パーツ
 
-# In[2]:
-
-
+# %%
 class base:
     saveFolder = ''
     saveFileName = ''
@@ -91,7 +87,13 @@ class base:
         isDebug = False
         
         # カレントディレクトリ取得
-        currentDir = os.path.dirname(os.path.abspath("__file__")) + '/'
+        currentDir = '/'
+        try:
+            # Node-RED から呼び出し
+            currentDir = os.path.dirname(__file__) + '/'
+        except:
+            # jupyterNotebook から呼び出し
+            currentDir = os.path.dirname(os.path.abspath("__file__")) + '/'
         print(currentDir)
         
         try:
@@ -183,9 +185,12 @@ class base:
         _alreadyGetURL = list()
         with open(oFile, mode='r') as fs:
             for line in fs:
-                j = json.loads(line)
-                _alreadyGetURL.append(j['url'])
-                
+                try:
+                    j = json.loads(line)
+                    _alreadyGetURL.append(j['url'])
+                except:
+                    print("Not Json Format :" + line)
+         
         with open(oFile, mode='a') as fs:
             for line in self.saveData:
                 j = json.loads(line)
@@ -197,12 +202,10 @@ class base:
         uf.fileDataSlim(oFile)    
     
 
-
+# %% [markdown]
 # ## スクレイピング本体
 
-# In[3]:
-
-
+# %%
 class work:
     baseURL = ''
     topURL = ''
@@ -264,8 +267,8 @@ class work:
             return False
 
         # Last PDF Link
-        print("[get Last PDF Link]")
-        print(_linkLastPath)
+        #print("[get Last PDF Link]")
+        #print(_linkLastPath)
         _html = uf.getHTML(_linkLastPath)
         bs = uf.getBS4(_html)
         _bsPDFPathList = bs.findAll("a", {"class":"resourceLink newWindow"})
@@ -274,9 +277,9 @@ class work:
             b.setSaveData(self.setSaveData(_url["href"], isLast))
         
         # previous PDF Link
-        print("[get Previous PDF Link]")
+        #print("[get Previous PDF Link]")
         for _link in _linkPrevPath:
-            print(_link)
+            #print(_link)
             _html = uf.getHTML(_link)
             bs = uf.getBS4(_html)
             _bsPDFPathList = bs.findAll("a", {"class":"icon_pdf"})
@@ -286,12 +289,10 @@ class work:
         
         return True
 
-
+# %% [markdown]
 # ## 最初に呼ばれる
 
-# In[4]:
-
-
+# %%
 def main():  
     print("\n[Start]" + uf.getNowTime() + '\n')            
 
@@ -315,12 +316,11 @@ def main():
     print("\n[ End ]" + uf.getNowTime() + '\n')
     
 
-
+# %% [markdown]
 # ## 処理開始
 
-# In[5]:
-
-
+# %%
 if __name__ == '__main__':
     main()
+
 

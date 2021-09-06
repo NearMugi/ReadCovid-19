@@ -1,6 +1,6 @@
-#!/usr/bin/env python
-# coding: utf-8
-
+# To add a new cell, type '# %%'
+# To add a new markdown cell, type '# %% [markdown]'
+# %% [markdown]
 # # 別紙と追加情報をマージする
 # ## データ形式
 # 
@@ -23,17 +23,13 @@
 # * 入力ファイルのデータを全て読み込んだ後、マージしたデータを出力する
 # 
 
-# In[1]:
-
-
+# %%
 import os
 from WebScrapingTool import Base_UserFunction as uf
 import json
 
 
-# In[2]:
-
-
+# %%
 def main():
     print("\n[Start]"  + uf.getNowTime() + '\n')
 
@@ -50,7 +46,13 @@ def main():
     _saveFileName = ''
 
     # カレントディレクトリ取得
-    currentDir = os.path.dirname(os.path.abspath("__file__")) + '/'
+    currentDir = '/'
+    try:
+        # Node-RED から呼び出し
+        currentDir = os.path.dirname(__file__) + '/'
+    except:
+        # jupyterNotebook から呼び出し
+        currentDir = os.path.dirname(os.path.abspath("__file__")) + '/'  
     print(currentDir)
 
     try:
@@ -147,4 +149,5 @@ def main():
     
 if __name__ == '__main__':
     main()
+
 

@@ -1,1 +1,652 @@
-[{"id":"84c18073.bc417","type":"tab","label":"フロー 1","disabled":false,"info":""},{"id":"9d94174f.083c98","type":"google-cloud-credentials","z":"","name":"GCP_GCS"},{"id":"13783ce3.080013","type":"inject","z":"84c18073.bc417","name":"cron","topic":"","payload":"false","payloadType":"bool","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":90,"y":40,"wires":[["36d9b218.189f4e"]]},{"id":"5aa42b5f.761594","type":"google-cloud-gcs-read","z":"84c18073.bc417","account":"9d94174f.083c98","keyFilename":"","filename":"","list":false,"name":"","x":180,"y":140,"wires":[["44382428.c8fe7c"]]},{"id":"aa78b858.4cdfc8","type":"function","z":"84c18073.bc417","name":"Get Setting Parameter","func":"msg.filename = \"gs://covid19-tokyo/_Setting.txt\";\nmsg.contentType = \"text/plain\";\nreturn msg;","outputs":1,"noerr":0,"x":220,"y":100,"wires":[["5aa42b5f.761594"]]},{"id":"71e056f9.f61bb8","type":"debug","z":"84c18073.bc417","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","x":590,"y":280,"wires":[]},{"id":"44382428.c8fe7c","type":"function","z":"84c18073.bc417","name":"buffer->string","func":"msg.payload = msg.payload.toString('utf8')\nreturn msg;","outputs":1,"noerr":0,"x":190,"y":180,"wires":[["f799cdcd.4d548"]]},{"id":"36d9b218.189f4e","type":"function","z":"84c18073.bc417","name":"set isGCE","func":"msg.isGCE = msg.payload;\nreturn msg;","outputs":1,"noerr":0,"x":220,"y":40,"wires":[["aa78b858.4cdfc8"]]},{"id":"f799cdcd.4d548","type":"switch","z":"84c18073.bc417","name":"isGCE?","property":"isGCE","propertyType":"msg","rules":[{"t":"true"},{"t":"false"}],"checkall":"true","repair":false,"outputs":2,"x":340,"y":180,"wires":[[],["22eb8723.533658"]]},{"id":"b5162869.260018","type":"exec","z":"84c18073.bc417","command":"python -u D:/#WorkSpace/ReadCovid-19/node-red/work/getURL.py","addpay":true,"append":"","useSpawn":"false","timer":"","oldrc":false,"name":"(local)getURL","x":320,"y":380,"wires":[["71e056f9.f61bb8"],["9aa3df59.db0b8"],["c0411c9c.82049"]]},{"id":"22eb8723.533658","type":"file","z":"84c18073.bc417","name":"(local)save","filename":"D:\\#WorkSpace\\ReadCovid-19\\node-red\\work\\_Setting.txt","appendNewline":true,"createDir":false,"overwriteFile":"true","encoding":"Shift_JIS","x":490,"y":220,"wires":[["ac7dd832.eec018"]]},{"id":"ac7dd832.eec018","type":"switch","z":"84c18073.bc417","name":"isGCE?","property":"isGCE","propertyType":"msg","rules":[{"t":"true"},{"t":"false"}],"checkall":"true","repair":false,"outputs":2,"x":140,"y":300,"wires":[["11c24c8.778f5b4"],["b5162869.260018"]]},{"id":"11c24c8.778f5b4","type":"exec","z":"84c18073.bc417","command":"python3 -u /mnt/ReadCovid-19/linebotTextSendMessage.py","addpay":true,"append":"","useSpawn":"false","timer":"","oldrc":false,"name":"(GCE)getURL","x":320,"y":300,"wires":[["71e056f9.f61bb8"],["9aa3df59.db0b8"],["c0411c9c.82049"]]},{"id":"9aa3df59.db0b8","type":"debug","z":"84c18073.bc417","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","x":590,"y":320,"wires":[]},{"id":"c0411c9c.82049","type":"debug","z":"84c18073.bc417","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","x":590,"y":360,"wires":[]}]
+[
+  {
+    "id": "84c18073.bc417",
+    "type": "tab",
+    "label": "フロー 1",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "9d94174f.083c98",
+    "type": "google-cloud-credentials",
+    "z": "",
+    "name": "GCP_GCS"
+  },
+  {
+    "id": "13783ce3.080013",
+    "type": "inject",
+    "z": "84c18073.bc417",
+    "name": "cron",
+    "topic": "",
+    "payload": "false",
+    "payloadType": "bool",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "x": 90,
+    "y": 40,
+    "wires": [
+      [
+        "36d9b218.189f4e"
+      ]
+    ]
+  },
+  {
+    "id": "5aa42b5f.761594",
+    "type": "google-cloud-gcs-read",
+    "z": "84c18073.bc417",
+    "account": "9d94174f.083c98",
+    "keyFilename": "",
+    "filename": "",
+    "list": false,
+    "name": "",
+    "x": 180,
+    "y": 140,
+    "wires": [
+      [
+        "44382428.c8fe7c"
+      ]
+    ]
+  },
+  {
+    "id": "aa78b858.4cdfc8",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "Get SettingFile",
+    "func": "msg.filename = msg.GCSPath + \"_Setting.txt\";\nmsg.contentType = \"text/plain\";\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 200,
+    "y": 100,
+    "wires": [
+      [
+        "5aa42b5f.761594"
+      ]
+    ]
+  },
+  {
+    "id": "71e056f9.f61bb8",
+    "type": "debug",
+    "z": "84c18073.bc417",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "x": 550,
+    "y": 1060,
+    "wires": []
+  },
+  {
+    "id": "44382428.c8fe7c",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "buffer->string",
+    "func": "msg.payload = msg.payload.toString('utf8')\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 190,
+    "y": 180,
+    "wires": [
+      [
+        "f799cdcd.4d548"
+      ]
+    ]
+  },
+  {
+    "id": "36d9b218.189f4e",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "set isGCE",
+    "func": "msg.isGCE = msg.payload;\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 220,
+    "y": 40,
+    "wires": [
+      [
+        "57e3fb8.1d1af04"
+      ]
+    ]
+  },
+  {
+    "id": "f799cdcd.4d548",
+    "type": "switch",
+    "z": "84c18073.bc417",
+    "name": "isGCE?",
+    "property": "isGCE",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "true"
+      },
+      {
+        "t": "false"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 2,
+    "x": 340,
+    "y": 180,
+    "wires": [
+      [
+        "f84400c6.6b584"
+      ],
+      [
+        "42898ac5.23a274"
+      ]
+    ]
+  },
+  {
+    "id": "b5162869.260018",
+    "type": "exec",
+    "z": "84c18073.bc417",
+    "command": "python -u D:/#WorkSpace/ReadCovid-19/node-red/work/getURL.py",
+    "addpay": true,
+    "append": "",
+    "useSpawn": "false",
+    "timer": "",
+    "oldrc": false,
+    "name": "(local)getURL",
+    "x": 320,
+    "y": 1000,
+    "wires": [
+      [
+        "71e056f9.f61bb8"
+      ],
+      [
+        "729fa6cf.a71f78"
+      ],
+      []
+    ]
+  },
+  {
+    "id": "22eb8723.533658",
+    "type": "file",
+    "z": "84c18073.bc417",
+    "name": "save",
+    "filename": "",
+    "appendNewline": true,
+    "createDir": false,
+    "overwriteFile": "true",
+    "encoding": "Shift_JIS",
+    "x": 670,
+    "y": 180,
+    "wires": [
+      [
+        "296f165.68c5fea"
+      ]
+    ]
+  },
+  {
+    "id": "ac7dd832.eec018",
+    "type": "switch",
+    "z": "84c18073.bc417",
+    "name": "isGCE?",
+    "property": "isGCE",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "true"
+      },
+      {
+        "t": "false"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 2,
+    "x": 140,
+    "y": 940,
+    "wires": [
+      [
+        "11c24c8.778f5b4"
+      ],
+      [
+        "b5162869.260018"
+      ]
+    ]
+  },
+  {
+    "id": "11c24c8.778f5b4",
+    "type": "exec",
+    "z": "84c18073.bc417",
+    "command": "python3 -u /mnt/ReadCovid-19/getURL.py",
+    "addpay": true,
+    "append": "",
+    "useSpawn": "false",
+    "timer": "",
+    "oldrc": false,
+    "name": "(GCE)getURL",
+    "x": 320,
+    "y": 940,
+    "wires": [
+      [
+        "71e056f9.f61bb8"
+      ],
+      [],
+      []
+    ]
+  },
+  {
+    "id": "296f165.68c5fea",
+    "type": "switch",
+    "z": "84c18073.bc417",
+    "name": "isGCE?",
+    "property": "isGCE",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "true"
+      },
+      {
+        "t": "false"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 2,
+    "x": 140,
+    "y": 320,
+    "wires": [
+      [
+        "3a9021b8.5aa0de"
+      ],
+      [
+        "e3cc38f9.d47d78"
+      ]
+    ]
+  },
+  {
+    "id": "3a9021b8.5aa0de",
+    "type": "exec",
+    "z": "84c18073.bc417",
+    "command": "python3 -u /mnt/ReadCovid-19/getSetting.py",
+    "addpay": true,
+    "append": "",
+    "useSpawn": "false",
+    "timer": "",
+    "oldrc": false,
+    "name": "(GCE)getSettingParameter",
+    "x": 360,
+    "y": 320,
+    "wires": [
+      [
+        "dfdea358.49f86"
+      ],
+      [],
+      []
+    ]
+  },
+  {
+    "id": "f4978999.2df2f8",
+    "type": "debug",
+    "z": "84c18073.bc417",
+    "name": "Error",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 790,
+    "y": 300,
+    "wires": []
+  },
+  {
+    "id": "3145e7ff.530be8",
+    "type": "debug",
+    "z": "84c18073.bc417",
+    "name": "return Code",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 810,
+    "y": 340,
+    "wires": []
+  },
+  {
+    "id": "e3cc38f9.d47d78",
+    "type": "exec",
+    "z": "84c18073.bc417",
+    "command": "python -u D:/#WorkSpace/ReadCovid-19/node-red/work/getSetting.py",
+    "addpay": true,
+    "append": "",
+    "useSpawn": "false",
+    "timer": "",
+    "oldrc": false,
+    "name": "(local)getSettingParameter",
+    "x": 360,
+    "y": 380,
+    "wires": [
+      [
+        "dfdea358.49f86"
+      ],
+      [],
+      []
+    ]
+  },
+  {
+    "id": "d706f304.6cda2",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "Get File",
+    "func": "var listFolder = msg.SettingParameter.listFolder + '/';\ndataListPath = listFolder + msg.SettingParameter.dataList;\nparseListPath = listFolder + msg.SettingParameter.parseList;\noutputListPath = listFolder + msg.SettingParameter.outputList;\nprevPressURLPath = listFolder + msg.SettingParameter.prevPressURLList;\n\nmsg.payload = {\n    \"dataList\" : [dataListPath, \"application/json\"],\n    \"parseList\" : [parseListPath, \"application/json\"],\n    \"outputList\" : [outputListPath, \"application/octet-stream\"],\n    \"prevPressURLList\" : [prevPressURLPath, \"text/plain\"]\n}\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 200,
+    "y": 520,
+    "wires": [
+      [
+        "8a6a758a.8a8508"
+      ]
+    ]
+  },
+  {
+    "id": "c012aa39.044a08",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "Get Setting Parameter",
+    "func": "msg.SettingParameter = msg.payload;\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 240,
+    "y": 480,
+    "wires": [
+      [
+        "c73d6654.1cbae8",
+        "d706f304.6cda2"
+      ]
+    ]
+  },
+  {
+    "id": "c73d6654.1cbae8",
+    "type": "debug",
+    "z": "84c18073.bc417",
+    "name": "",
+    "active": false,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "SettingParameter",
+    "targetType": "msg",
+    "x": 480,
+    "y": 480,
+    "wires": []
+  },
+  {
+    "id": "dfdea358.49f86",
+    "type": "json",
+    "z": "84c18073.bc417",
+    "name": "",
+    "property": "payload",
+    "action": "",
+    "pretty": false,
+    "x": 630,
+    "y": 400,
+    "wires": [
+      [
+        "c012aa39.044a08"
+      ]
+    ]
+  },
+  {
+    "id": "57e3fb8.1d1af04",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "define",
+    "func": "msg.GCSPath = \"gs://covid19-tokyo/\";\n\nmsg.GCEPath = \"/mnt/ReadCovid-19\";\nmsg.localPath = \"D:/#WorkSpace/ReadCovid-19/node-red/work/\";\n\nmsg.settingFileName = \"_Setting.txt\"\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 350,
+    "y": 40,
+    "wires": [
+      [
+        "aa78b858.4cdfc8"
+      ]
+    ]
+  },
+  {
+    "id": "42898ac5.23a274",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "(local)fileName",
+    "func": "msg.filename = msg.localPath + msg.settingFileName;\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 500,
+    "y": 200,
+    "wires": [
+      [
+        "22eb8723.533658"
+      ]
+    ]
+  },
+  {
+    "id": "f84400c6.6b584",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "(GCE)fileName",
+    "func": "msg.filename = msg.GCSPath + msg.settingFileName;\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 500,
+    "y": 140,
+    "wires": [
+      [
+        "22eb8723.533658"
+      ]
+    ]
+  },
+  {
+    "id": "8a6a758a.8a8508",
+    "type": "split",
+    "z": "84c18073.bc417",
+    "name": "",
+    "splt": "\\n",
+    "spltType": "str",
+    "arraySplt": 1,
+    "arraySpltType": "len",
+    "stream": false,
+    "addname": "",
+    "x": 330,
+    "y": 520,
+    "wires": [
+      [
+        "c195da7a.cc0558"
+      ]
+    ]
+  },
+  {
+    "id": "c195da7a.cc0558",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "Get dataList",
+    "func": "\nmsg.saveFileName = msg.payload[\"0\"];\n\nmsg.filename = msg.GCSPath;\nmsg.filename += msg.saveFileName;\nmsg.contentType = msg.payload[\"1\"];\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 490,
+    "y": 520,
+    "wires": [
+      [
+        "4fb1b62d.c8e048"
+      ]
+    ]
+  },
+  {
+    "id": "4fb1b62d.c8e048",
+    "type": "google-cloud-gcs-read",
+    "z": "84c18073.bc417",
+    "account": "9d94174f.083c98",
+    "keyFilename": "",
+    "filename": "",
+    "list": false,
+    "name": "",
+    "x": 480,
+    "y": 560,
+    "wires": [
+      [
+        "24878862.433038"
+      ]
+    ]
+  },
+  {
+    "id": "24878862.433038",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "buffer->string",
+    "func": "msg.payload = msg.payload.toString('utf8')\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 490,
+    "y": 600,
+    "wires": [
+      [
+        "66e944e6.eb2f4c"
+      ]
+    ]
+  },
+  {
+    "id": "66e944e6.eb2f4c",
+    "type": "switch",
+    "z": "84c18073.bc417",
+    "name": "isGCE?",
+    "property": "isGCE",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "true"
+      },
+      {
+        "t": "false"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 2,
+    "x": 500,
+    "y": 640,
+    "wires": [
+      [
+        "bf766d3e.cf363"
+      ],
+      [
+        "b7d54e8d.f858e"
+      ]
+    ]
+  },
+  {
+    "id": "97e465d5.db0378",
+    "type": "file",
+    "z": "84c18073.bc417",
+    "name": "save",
+    "filename": "",
+    "appendNewline": true,
+    "createDir": false,
+    "overwriteFile": "true",
+    "encoding": "Shift_JIS",
+    "x": 870,
+    "y": 640,
+    "wires": [
+      [
+        "57408a63.b5c804"
+      ]
+    ]
+  },
+  {
+    "id": "b7d54e8d.f858e",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "(local)fileName",
+    "func": "msg.filename = msg.localPath + msg.saveFileName;\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 700,
+    "y": 640,
+    "wires": [
+      [
+        "97e465d5.db0378"
+      ]
+    ]
+  },
+  {
+    "id": "bf766d3e.cf363",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "(GCE)fileName",
+    "func": "msg.filename = msg.GCSPath + msg.saveFileName;\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 700,
+    "y": 600,
+    "wires": [
+      [
+        "97e465d5.db0378"
+      ]
+    ]
+  },
+  {
+    "id": "57408a63.b5c804",
+    "type": "join",
+    "z": "84c18073.bc417",
+    "name": "",
+    "mode": "auto",
+    "build": "string",
+    "property": "payload",
+    "propertyType": "msg",
+    "key": "topic",
+    "joiner": "\\n",
+    "joinerType": "str",
+    "accumulate": false,
+    "timeout": "",
+    "count": "",
+    "reduceRight": false,
+    "reduceExp": "",
+    "reduceInit": "",
+    "reduceInitType": "",
+    "reduceFixup": "",
+    "x": 330,
+    "y": 740,
+    "wires": [
+      [
+        "ac7dd832.eec018"
+      ]
+    ]
+  },
+  {
+    "id": "729fa6cf.a71f78",
+    "type": "debug",
+    "z": "84c18073.bc417",
+    "name": "Error",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 530,
+    "y": 940,
+    "wires": []
+  },
+  {
+    "id": "750ce558.315f2c",
+    "type": "debug",
+    "z": "84c18073.bc417",
+    "name": "return Code",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 550,
+    "y": 980,
+    "wires": []
+  }
+]
