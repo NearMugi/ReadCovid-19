@@ -74,12 +74,22 @@ def main():
     
     baseText =_saveFolder + "/" + _saveFileName
     print(baseText)
+
+    # フォルダ作成
+    os.makedirs(_savePDFFolder, exist_ok = True)
     
     # ファイルを開く
     updateList = list()
     with open(baseText, mode='r') as f:
         cnt = 0
         for line in f:
+            if len(line) <= 0:
+                print("Size Zero")  
+                continue
+            if not ( set(('{', '}')) <= set(line)):
+                print("Not Json Format :" + line)  
+                continue
+
             l = line
             j = json.loads(line)
             URL = j['url']
@@ -90,6 +100,7 @@ def main():
                     cnt += 1
                     print("...Access ImageURL : " + URL + '  ' + str(cnt))
                     l = l.replace('"isGetPDF" : "False"', '"isGetPDF" : "True"')
+
             updateList.append(l)
 
         print('\n...Get Size :' + str(cnt) + '\n')

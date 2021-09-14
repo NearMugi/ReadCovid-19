@@ -378,6 +378,13 @@ def main():
     with open(baseFile, mode='r') as f:
         cnt = 0
         for line in f:
+            if len(line) <= 0:
+                print("Size Zero")  
+                continue
+            if not ( set(('{', '}')) <= set(line)):
+                print("Not Json Format :" + line)  
+                continue
+
             l = line
             j = json.loads(line)
             type = j['type']
@@ -393,6 +400,7 @@ def main():
                 cnt += 1
                 print("...Parse PDF : " + fileName + '  ' + str(cnt))
                 l = l.replace('"isParse" : "False"', '"isParse" : "True"')
+               
             updateList.append(l)
 
         print('\n...Get Size :' + str(cnt) + '\n')

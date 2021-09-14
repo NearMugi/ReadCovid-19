@@ -185,19 +185,24 @@ class base:
         _alreadyGetURL = list()
         with open(oFile, mode='r') as fs:
             for line in fs:
-                try:
-                    j = json.loads(line)
-                    _alreadyGetURL.append(j['url'])
-                except:
-                    print("Not Json Format :" + line)
-         
+                if len(line) <= 0:
+                    print("Size Zero")  
+                    continue
+                if not ( set(('{', '}')) <= set(line)):
+                    print("Not Json Format :" + line)  
+                    continue
+
+                j = json.loads(line)
+                _alreadyGetURL.append(j['url'])
+                
         with open(oFile, mode='a') as fs:
             for line in self.saveData:
                 j = json.loads(line)
                 if not j['url'] in _alreadyGetURL:
                     uf.fileWrite(fs, line)
                 else:
-                    print('already get url : ' + line)
+                    pass
+#                    print('already get url : ' + line)
         # 重複データ削除    
         uf.fileDataSlim(oFile)    
     
@@ -267,8 +272,8 @@ class work:
             return False
 
         # Last PDF Link
-        #print("[get Last PDF Link]")
-        #print(_linkLastPath)
+        print("[get Last PDF Link]")
+        print(_linkLastPath)
         _html = uf.getHTML(_linkLastPath)
         bs = uf.getBS4(_html)
         _bsPDFPathList = bs.findAll("a", {"class":"resourceLink newWindow"})
@@ -277,9 +282,9 @@ class work:
             b.setSaveData(self.setSaveData(_url["href"], isLast))
         
         # previous PDF Link
-        #print("[get Previous PDF Link]")
+        print("[get Previous PDF Link]")
         for _link in _linkPrevPath:
-            #print(_link)
+            print(_link)
             _html = uf.getHTML(_link)
             bs = uf.getBS4(_html)
             _bsPDFPathList = bs.findAll("a", {"class":"icon_pdf"})
