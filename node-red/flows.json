@@ -2,7 +2,7 @@
   {
     "id": "84c18073.bc417",
     "type": "tab",
-    "label": "フロー 1",
+    "label": "ReadCovid-19",
     "disabled": false,
     "info": ""
   },
@@ -28,7 +28,8 @@
     "y": 40,
     "wires": [
       [
-        "36d9b218.189f4e"
+        "36d9b218.189f4e",
+        "585c5a66.9eb6f4"
       ]
     ]
   },
@@ -42,7 +43,7 @@
     "list": false,
     "name": "",
     "x": 180,
-    "y": 140,
+    "y": 200,
     "wires": [
       [
         "44382428.c8fe7c"
@@ -58,7 +59,7 @@
     "outputs": 1,
     "noerr": 0,
     "x": 190,
-    "y": 100,
+    "y": 160,
     "wires": [
       [
         "5aa42b5f.761594"
@@ -88,7 +89,7 @@
     "outputs": 1,
     "noerr": 0,
     "x": 190,
-    "y": 180,
+    "y": 240,
     "wires": [
       [
         "f799cdcd.4d548"
@@ -103,8 +104,8 @@
     "func": "msg.isGCE = msg.payload;\nreturn msg;",
     "outputs": 1,
     "noerr": 0,
-    "x": 220,
-    "y": 40,
+    "x": 180,
+    "y": 100,
     "wires": [
       [
         "5d1474f.d64998c"
@@ -130,7 +131,7 @@
     "repair": false,
     "outputs": 2,
     "x": 340,
-    "y": 180,
+    "y": 240,
     "wires": [
       [
         "f84400c6.6b584"
@@ -175,7 +176,7 @@
     "overwriteFile": "true",
     "encoding": "Shift_JIS",
     "x": 670,
-    "y": 180,
+    "y": 240,
     "wires": [
       [
         "296f165.68c5fea"
@@ -372,7 +373,7 @@
     "type": "debug",
     "z": "84c18073.bc417",
     "name": "",
-    "active": false,
+    "active": true,
     "tosidebar": true,
     "console": false,
     "tostatus": false,
@@ -407,7 +408,7 @@
     "outputs": 1,
     "noerr": 0,
     "x": 500,
-    "y": 200,
+    "y": 260,
     "wires": [
       [
         "22eb8723.533658"
@@ -423,7 +424,7 @@
     "outputs": 1,
     "noerr": 0,
     "x": 500,
-    "y": 140,
+    "y": 200,
     "wires": [
       [
         "22eb8723.533658"
@@ -710,7 +711,9 @@
     "x": 650,
     "y": 1660,
     "wires": [
-      []
+      [
+        "ab573d4c.5a12c"
+      ]
     ]
   },
   {
@@ -911,8 +914,8 @@
     "checkall": "true",
     "repair": false,
     "outputs": 2,
-    "x": 360,
-    "y": 40,
+    "x": 320,
+    "y": 100,
     "wires": [
       [
         "7ab902e8.c7139c"
@@ -930,8 +933,8 @@
     "func": "msg.localPath = \"D:/#WorkSpace/ReadCovid-19/node-red/work/\";\nreturn msg;",
     "outputs": 1,
     "noerr": 0,
-    "x": 500,
-    "y": 60,
+    "x": 460,
+    "y": 120,
     "wires": [
       [
         "44391882.4d6888"
@@ -946,8 +949,8 @@
     "func": "msg.localPath = \"/mnt/ReadCovid-19/\";\nreturn msg;",
     "outputs": 1,
     "noerr": 0,
-    "x": 500,
-    "y": 20,
+    "x": 460,
+    "y": 80,
     "wires": [
       [
         "44391882.4d6888"
@@ -962,11 +965,12 @@
     "func": "msg.GCSPath = \"gs://covid19-tokyo/\";\nmsg.settingFileName = \"_Setting.txt\";\n\nreturn msg;",
     "outputs": 1,
     "noerr": 0,
-    "x": 650,
-    "y": 60,
+    "x": 610,
+    "y": 120,
     "wires": [
       [
-        "aa78b858.4cdfc8"
+        "aa78b858.4cdfc8",
+        "f9b9901f.8f61e"
       ]
     ]
   },
@@ -992,7 +996,7 @@
     "z": "84c18073.bc417",
     "name": "",
     "filename": "",
-    "format": "utf8",
+    "format": "",
     "chunk": false,
     "sendError": false,
     "encoding": "none",
@@ -1079,5 +1083,82 @@
         "a4eae4bd.5d0598"
       ]
     ]
+  },
+  {
+    "id": "585c5a66.9eb6f4",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "log",
+    "func": "msg.log = \"start\"\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 250,
+    "y": 40,
+    "wires": [
+      [
+        "b29aa060.a437c"
+      ]
+    ]
+  },
+  {
+    "id": "b29aa060.a437c",
+    "type": "debug",
+    "z": "84c18073.bc417",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "log",
+    "targetType": "msg",
+    "x": 380,
+    "y": 40,
+    "wires": []
+  },
+  {
+    "id": "ab573d4c.5a12c",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "log",
+    "func": "msg.log = \"end\"\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 770,
+    "y": 1700,
+    "wires": [
+      [
+        "d35a8120.bb9e4"
+      ]
+    ]
+  },
+  {
+    "id": "d35a8120.bb9e4",
+    "type": "debug",
+    "z": "84c18073.bc417",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "log",
+    "targetType": "msg",
+    "x": 900,
+    "y": 1700,
+    "wires": []
+  },
+  {
+    "id": "f9b9901f.8f61e",
+    "type": "debug",
+    "z": "84c18073.bc417",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "x": 770,
+    "y": 120,
+    "wires": []
   }
 ]
