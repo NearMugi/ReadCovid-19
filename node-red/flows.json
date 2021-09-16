@@ -152,7 +152,7 @@
     "oldrc": false,
     "name": "(local)getURL",
     "x": 340,
-    "y": 1060,
+    "y": 1160,
     "wires": [
       [
         "8890f207.06b67",
@@ -617,7 +617,7 @@
     "complete": "payload",
     "targetType": "msg",
     "x": 650,
-    "y": 1080,
+    "y": 1160,
     "wires": []
   },
   {
@@ -632,7 +632,7 @@
     "complete": "payload",
     "targetType": "msg",
     "x": 670,
-    "y": 1020,
+    "y": 1100,
     "wires": []
   },
   {
@@ -644,27 +644,11 @@
     "filename": "",
     "contentType": "",
     "name": "",
-    "x": 800,
-    "y": 1400,
+    "x": 780,
+    "y": 1620,
     "wires": [
       [
         "252a2040.a46ef"
-      ]
-    ]
-  },
-  {
-    "id": "d2b4105c.13bd3",
-    "type": "function",
-    "z": "84c18073.bc417",
-    "name": "GCS Files",
-    "func": "var listFolder = msg.SettingParameter.listFolder + '/';\ndataListPath = listFolder + msg.SettingParameter.dataList;\nparseListPath = listFolder + msg.SettingParameter.parseList;\noutputListPath = listFolder + msg.SettingParameter.outputList;\nprevPressURLPath = listFolder + msg.SettingParameter.prevPressURLList;\n\nmsg.payload = {\n    \"dataList\" : [dataListPath, \"application/json\"],\n    \"parseList\" : [parseListPath, \"application/json\"],\n    \"outputList\" : [outputListPath, \"application/octet-stream\"],\n    \"prevPressURLList\" : [prevPressURLPath, \"text/plain\"]\n}\n\nreturn msg;",
-    "outputs": 1,
-    "noerr": 0,
-    "x": 630,
-    "y": 1240,
-    "wires": [
-      [
-        "a4eae4bd.5d0598"
       ]
     ]
   },
@@ -679,8 +663,8 @@
     "arraySpltType": "len",
     "stream": false,
     "addname": "",
-    "x": 670,
-    "y": 1280,
+    "x": 650,
+    "y": 1500,
     "wires": [
       [
         "1b2ad931.fb8a47"
@@ -695,8 +679,8 @@
     "func": "\nmsg.saveFileName = msg.payload[\"0\"];\n\nmsg.filename = msg.localPath;\nmsg.filename += msg.saveFileName;\nmsg.contentType = msg.payload[\"1\"];\nreturn msg;",
     "outputs": 1,
     "noerr": 0,
-    "x": 800,
-    "y": 1280,
+    "x": 780,
+    "y": 1500,
     "wires": [
       [
         "8c5ebc8d.570e4"
@@ -723,8 +707,8 @@
     "reduceInit": "",
     "reduceInitType": "",
     "reduceFixup": "",
-    "x": 670,
-    "y": 1440,
+    "x": 650,
+    "y": 1660,
     "wires": [
       []
     ]
@@ -763,7 +747,7 @@
     "oldrc": false,
     "name": "(local)getPDF",
     "x": 340,
-    "y": 1120,
+    "y": 1220,
     "wires": [
       [
         "719b370.b894cc8",
@@ -773,26 +757,6 @@
         "729fa6cf.a71f78"
       ],
       []
-    ]
-  },
-  {
-    "id": "1718726.3b4358e",
-    "type": "inject",
-    "z": "84c18073.bc417",
-    "name": "switch",
-    "topic": "",
-    "payload": "false",
-    "payloadType": "bool",
-    "repeat": "",
-    "crontab": "",
-    "once": false,
-    "onceDelay": 0.1,
-    "x": 90,
-    "y": 1220,
-    "wires": [
-      [
-        "36d9b218.189f4e"
-      ]
     ]
   },
   {
@@ -829,7 +793,7 @@
     "oldrc": false,
     "name": "(local)readPDF",
     "x": 340,
-    "y": 1180,
+    "y": 1280,
     "wires": [
       [
         "d615f4fe.d0eef8",
@@ -884,7 +848,8 @@
     "y": 980,
     "wires": [
       [
-        "bdf4fd17.7aab1"
+        "bdf4fd17.7aab1",
+        "3fe05dcd.5c9e92"
       ],
       [],
       []
@@ -916,11 +881,11 @@
     "oldrc": false,
     "name": "(local)mergePDF",
     "x": 350,
-    "y": 1240,
+    "y": 1340,
     "wires": [
       [
         "bdf4fd17.7aab1",
-        "d2b4105c.13bd3"
+        "7a088bfa.29fb94"
       ],
       [
         "729fa6cf.a71f78"
@@ -1013,8 +978,8 @@
     "func": "\nmsg.filename = msg.GCSPath;\nmsg.filename += msg.saveFileName;\nreturn msg;",
     "outputs": 1,
     "noerr": 0,
-    "x": 800,
-    "y": 1360,
+    "x": 780,
+    "y": 1580,
     "wires": [
       [
         "b8fe5baa.c80728"
@@ -1031,11 +996,87 @@
     "chunk": false,
     "sendError": false,
     "encoding": "none",
-    "x": 790,
-    "y": 1320,
+    "x": 770,
+    "y": 1540,
     "wires": [
       [
         "5d0ced5a.21ba94"
+      ]
+    ]
+  },
+  {
+    "id": "7a088bfa.29fb94",
+    "type": "exec",
+    "z": "84c18073.bc417",
+    "command": "python -u D:/#WorkSpace/ReadCovid-19/node-red/work/getFileList.py",
+    "addpay": true,
+    "append": "",
+    "useSpawn": "false",
+    "timer": "",
+    "oldrc": false,
+    "name": "(local)getFileList",
+    "x": 340,
+    "y": 1400,
+    "wires": [
+      [
+        "c70e71f8.aacbb",
+        "ee589036.6c453"
+      ],
+      [
+        "729fa6cf.a71f78"
+      ],
+      []
+    ]
+  },
+  {
+    "id": "3fe05dcd.5c9e92",
+    "type": "exec",
+    "z": "84c18073.bc417",
+    "command": "python3 -u /mnt/ReadCovid-19/getFileList.py",
+    "addpay": true,
+    "append": "",
+    "useSpawn": "false",
+    "timer": "",
+    "oldrc": false,
+    "name": "(GCE)getFileList",
+    "x": 340,
+    "y": 1040,
+    "wires": [
+      [
+        "c70e71f8.aacbb",
+        "ee589036.6c453"
+      ],
+      [],
+      []
+    ]
+  },
+  {
+    "id": "c70e71f8.aacbb",
+    "type": "debug",
+    "z": "84c18073.bc417",
+    "name": "",
+    "active": false,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "x": 670,
+    "y": 1020,
+    "wires": []
+  },
+  {
+    "id": "ee589036.6c453",
+    "type": "json",
+    "z": "84c18073.bc417",
+    "name": "",
+    "property": "payload",
+    "action": "",
+    "pretty": false,
+    "x": 650,
+    "y": 1460,
+    "wires": [
+      [
+        "a4eae4bd.5d0598"
       ]
     ]
   }
