@@ -34,3 +34,5 @@
 [m]prevPressURL.txt
 #Log
 [o]parse_DATE.log
+#Header
+[p]date,under10,10,20,30,40,50,60,70,80,90,100,unknown,SeriouslyIll_10,SeriouslyIll_20,SeriouslyIll_30,SeriouslyIll_40,SeriouslyIll_50,SeriouslyIll_60,SeriouslyIll_70,SeriouslyIll_80,SeriouslyIll_90,SeriouslyIll_100,SeriouslyIll_unknown,SeriouslyIll_male,SeriouslyIll_female,SeriouslyIll_sex_unknown

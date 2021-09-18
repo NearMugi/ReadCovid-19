@@ -31,6 +31,7 @@ class readSettingFile:
         tag_saveOutputListName = '[k]'
         tag_prevPressURLName = '[m]'
         tag_logName = '[o]'
+        tag_header = '[p]'
         
         # カレントディレクトリ取得
         currentDir = '/'
@@ -60,6 +61,8 @@ class readSettingFile:
                         retDict['prevPressURLList'] = l.replace(tag_prevPressURLName, '').rstrip()
                     if l.startswith(tag_logName, 0, 3):
                         retDict['log'] = l.replace(tag_logName, '').rstrip()
+                    if l.startswith(tag_header, 0, 3):
+                        retDict['header'] = l.replace(tag_header, '').rstrip()
 
         except:
             print('[!!!ERROR!!!] Read Setting Text')

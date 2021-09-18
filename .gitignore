@@ -132,3 +132,4 @@ dmypy.json
 *.pdf
 credential_GCS.json
 flows_cred.json
+node-red/serviceAccount_SpreadSheet.json

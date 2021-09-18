@@ -13,6 +13,11 @@
     "name": "GCP_GCS"
   },
   {
+    "id": "bf33e5a3.ce3888",
+    "type": "gauth",
+    "z": ""
+  },
+  {
     "id": "13783ce3.080013",
     "type": "inject",
     "z": "84c18073.bc417",
@@ -630,7 +635,7 @@
     "y": 1660,
     "wires": [
       [
-        "ab573d4c.5a12c"
+        "899541c6.1e293"
       ]
     ]
   },
@@ -1049,8 +1054,8 @@
     "func": "msg.log = \"end\"\nreturn msg;",
     "outputs": 1,
     "noerr": 0,
-    "x": 770,
-    "y": 1700,
+    "x": 830,
+    "y": 1960,
     "wires": [
       [
         "d35a8120.bb9e4"
@@ -1068,8 +1073,8 @@
     "tostatus": false,
     "complete": "log",
     "targetType": "msg",
-    "x": 900,
-    "y": 1700,
+    "x": 980,
+    "y": 1960,
     "wires": []
   },
   {
@@ -1086,5 +1091,90 @@
     "x": 770,
     "y": 120,
     "wires": []
+  },
+  {
+    "id": "6a8d8c36.d3bde4",
+    "type": "GSheet",
+    "z": "84c18073.bc417",
+    "creds": "bf33e5a3.ce3888",
+    "method": "update",
+    "action": "",
+    "sheet": "1kRNNbwY8uZ4v6yivapLckVG5iI9iLlTbZeSk6xq8LNE",
+    "cells": "list!A1",
+    "flatten": true,
+    "name": "",
+    "x": 670,
+    "y": 1900,
+    "wires": [
+      [
+        "ab573d4c.5a12c"
+      ]
+    ]
+  },
+  {
+    "id": "899541c6.1e293",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "FilePath(outputList)",
+    "func": "var listFolder = msg.SettingParameter.listFolder + '/';\nmsg.filename = msg.localPath;\nmsg.filename += listFolder + msg.SettingParameter.outputList;\nmsg.contentType = \"application/octet-stream\";\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 670,
+    "y": 1780,
+    "wires": [
+      [
+        "663d9ac8.11c934"
+      ]
+    ]
+  },
+  {
+    "id": "663d9ac8.11c934",
+    "type": "file in",
+    "z": "84c18073.bc417",
+    "name": "",
+    "filename": "",
+    "format": "utf8",
+    "chunk": false,
+    "sendError": false,
+    "encoding": "none",
+    "x": 630,
+    "y": 1820,
+    "wires": [
+      [
+        "bff8c6f.cbae938"
+      ]
+    ]
+  },
+  {
+    "id": "dacd3a9d.4665c8",
+    "type": "debug",
+    "z": "84c18073.bc417",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 910,
+    "y": 1860,
+    "wires": []
+  },
+  {
+    "id": "bff8c6f.cbae938",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "string->csv(like)",
+    "func": "var recordList = msg.payload.split('\\n');\nvar cnt = recordList.length;\nvar retList = [];\nretList.push(msg.SettingParameter.header.split(','));\n\nfor(var i=0; i<cnt; i++)\n{\n    retList.push(recordList[i].split(','));\n}\nmsg.payload = retList;\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 660,
+    "y": 1860,
+    "wires": [
+      [
+        "dacd3a9d.4665c8",
+        "6a8d8c36.d3bde4"
+      ]
+    ]
   }
 ]
