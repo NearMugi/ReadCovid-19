@@ -232,39 +232,42 @@ def parse(filePath, type):
                     idx = 0
                     keyList = ['mi', '10', '20', '30', '40', '50', '60', '70', '80', '90', 'hu', 'un']
                     for key in keyList:
-                        if tmpHeader[0:2] == key:
+                        if key in tmpHeader:
                             tmpGetList.append(tmpList[idx])
                             idx += 1
                             tmpHeader = tmpHeader[2:]
                         else:
                             tmpGetList.append('0')
+                    print(tmpGetList)
                     # データは1行しかないので、必ず終了
                     isEnd = True
 
                 # 重症者を取得するとき、以下の通り分割する
-                # 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 確認中, 男, 女, 確認中
+                # 10歳未満, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 確認中, 男, 女, 確認中
                 elif type == typeSeriouslyIll:
                     tmpList = text.split(SPLITWORD)
+                    tmpHeader = tmpHeader.replace('10歳未満', 'mi')
                     tmpHeader = tmpHeader.replace('100', 'hu')
-                    tmpHeader = tmpHeader.replace('確認中', 'un')
+                    tmpHeader = tmpHeader.replace('確認中', 'u1', 1)
+                    tmpHeader = tmpHeader.replace('確認中', 'u2', 1)
                     tmpHeader = tmpHeader.replace('男', 'ma')
                     tmpHeader = tmpHeader.replace('女', 'fe')
                     tmpHeader = tmpHeader.replace('代', '')
                     tmpHeader = tmpHeader.replace(SPLITWORD, '')
+                    #print(tmpHeader)
+                            
                     idx = 0
-                    keyList = ['10', '20', '30', '40', '50', '60', '70', '80', '90', 'hu', 'un', 'ma', 'fe', 'un']
+                    keyList = ['mi', '10', '20', '30', '40', '50', '60', '70', '80', '90', 'hu', 'u1', 'ma', 'fe', 'u2']
                     for key in keyList:
-                        if tmpHeader[0:2] == key:
+                        if key in tmpHeader:
                             tmpGetList.append(tmpList[idx])
                             idx += 1
                             tmpHeader = tmpHeader[2:]
                         else:
                             tmpGetList.append('0')
 
-                    #print(tmpHeader)
                     #print(tmpList)
-                    #print(tmpGetList)
-                    
+                    print(tmpGetList)
                     # データは1行しかないので、必ず終了
                     isEnd = True
                 
