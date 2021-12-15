@@ -1,79 +1,61 @@
-# To add a new cell, type '# %%'
-# To add a new markdown cell, type '# %% [markdown]'
 # %%
 import os
-from WebScrapingTool import Base_UserFunction as uf
+import sys
 import json
+from WebScrapingTool import Base_UserFunction as uf
+import comFunction
 import urllib
-
 
 # %%
 def getPDF(url, savePath, fn):
+    com = comFunction.common()
     savePath = os.path.join(savePath, fn)
     try:
         urllib.request.urlretrieve(url, savePath)
     except:
-        print('ERROR  url: ' + url)
+        com.errMsg(sys._getframe().f_code.co_name, 'url: ' + url)
         return False
     return True    
 
 
 # %%
 def main():
-    import re
-    print("\n[Start]"  + uf.getNowTime() + '\n')
+    com = comFunction.common()
+    com.infoMsg(sys._getframe().f_code.co_name, 'Start')
 
     #設定ファイルから必要な情報を取得する
+    settingDict = dict()
+    tagSaveDir = '[0]'
     #タグ
-    tag_debug = '[a]'
-    tag_saveFolder = '[b]'
-    tag_savePDFFolder = '[B]'
-    tag_saveFileName = '[c]'
+    tagDebug = '[a]'
+    tagSaveFolder = '[b]'
+    tagSavePDFFolder = '[B]'
+    tagSaveFileName = '[c]'
     
-    isDebug = False
-    _saveFolder = ''
-    _savePDFFolder = ''
-    _saveFileName = ''
+    settingDict = com.getSettingData([
+        tagSaveDir,
+        tagDebug,
+        tagSaveFolder,
+        tagSavePDFFolder,
+        tagSaveFileName
+        ])        
+    com.infoMsg(sys._getframe().f_code.co_name, json.dumps(settingDict))
 
-    # カレントディレクトリ取得
-    currentDir = '/'
-    try:
-        # Node-RED から呼び出し
-        currentDir = os.path.dirname(__file__) + '/'
-    except:
-        # jupyterNotebook から呼び出し
-        currentDir = os.path.dirname(os.path.abspath("__file__")) + '/'
-    print(currentDir)
+    if len(settingDict) <= 0:
+        com.errMsg(sys._getframe().f_code.co_name, 'SettingData is none...')
+        return
 
-    try:
-        with open(currentDir + '_Setting.txt', mode='r') as f:
-            lines = f.readlines()
-            for l in lines:
-                if l.startswith(tag_debug, 0, 3):
-                    if (l.replace(tag_debug, '').rstrip()).lower() == 'true':
-                        isDebug = True
-                    else:
-                        isDebug = False                    
+    if settingDict[tagDebug] == 'true':
+        com.setDebug(True)
+    else:
+        com.setDebug(False)
 
-                if l.startswith(tag_saveFolder, 0, 3):
-                    _saveFolder = currentDir + l.replace(tag_saveFolder, '').rstrip()
-             
-                if l.startswith(tag_saveFileName, 0, 3):
-                    _saveFileName = l.replace(tag_saveFileName, '').rstrip()
-             
-                if l.startswith(tag_savePDFFolder, 0, 3):
-                    _savePDFFolder = currentDir + l.replace(tag_savePDFFolder, '').rstrip()
-             
-    except:
-        print('[!!!ERROR!!!] Read Setting.text')
-        return        
-    
-    if len(_saveFolder) <= 0:
-        print('[!!!ERROR!!!] Image data storage folder is None!')
-        return  
-    
+    _saveFolder = settingDict[tagSaveFolder]
+    _savePDFFolder = settingDict[tagSavePDFFolder]
+    _saveFileName = settingDict[tagSaveFileName]
+
     baseText =_saveFolder + "/" + _saveFileName
-    print(baseText)
+    com.infoMsg(sys._getframe().f_code.co_name, 'URLList : ' + baseText)
 
     # フォルダ作成
     os.makedirs(_savePDFFolder, exist_ok = True)
@@ -84,10 +66,10 @@ def main():
         cnt = 0
         for line in f:
             if len(line) <= 0:
-                print("Size Zero")  
+                com.infoMsg(sys._getframe().f_code.co_name, 'Size Zero')
                 continue
             if not ( set(('{', '}')) <= set(line)):
-                print("Not Json Format :" + line)  
+                com.infoMsg(sys._getframe().f_code.co_name, 'Not Json Format : ' + line)
                 continue
 
             l = line
@@ -98,12 +80,12 @@ def main():
             if isGetPDF == "False":
                 if getPDF(URL, _savePDFFolder, fileName):
                     cnt += 1
-                    print("...Access ImageURL : " + URL + '  ' + str(cnt))
+                    com.infoMsg(sys._getframe().f_code.co_name, 'Access URL : ' + URL + '  ' + str(cnt))
                     l = l.replace('"isGetPDF" : "False"', '"isGetPDF" : "True"')
 
             updateList.append(l)
 
-        print('\n...Get Size :' + str(cnt) + '\n')
+        com.infoMsg(sys._getframe().f_code.co_name, 'Get Size :' + str(cnt))
 
     # ファイル更新
     with open(baseText, mode='w') as f:
@@ -112,7 +94,7 @@ def main():
     # 重複データ削除
     uf.fileDataSlim(baseText) 
 
-    print("\n[ End ]"  + uf.getNowTime() + '\n')
+    com.infoMsg(sys._getframe().f_code.co_name, 'End')
     
     
 if __name__ == '__main__':
