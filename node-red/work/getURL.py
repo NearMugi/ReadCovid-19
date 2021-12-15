@@ -1,5 +1,3 @@
-# To add a new cell, type '# %%'
-# To add a new markdown cell, type '# %% [markdown]'
 # %% [markdown]
 # # 東京都福祉保健局のHPから新型コロナウイルスに関連した患者の発生について（過去1週間分）のPDFのURLをテキストに出力  
 #   
@@ -28,143 +26,97 @@
 # ### name
 # 
 # 
+
 # %% [markdown]
 # ## import
 
 # %%
 import os
+import sys
 import json
 from WebScrapingTool import Base_UserFunction as uf
+import comFunction
 
-#デバッグモードの指定
-#コンストラクタでTrue/Falseを設定
-#main()でインスタンスを定義
-global DEBUG
-class debug:
-    #コンストラクタ
-    def __init__(self, isDebug):
-        global DEBUG
-        DEBUG = isDebug
-    def printLog(self, msg):
-        if DEBUG:
-            print(msg)
 
 # %% [markdown]
 # ## 基本パーツ
 
 # %%
 class base:
-    saveFolder = ''
-    saveFileName = ''
-    baseURL = ''
-    topURL = ''
-    previousPDFLinkURL = ''
-    typeLast = ''
-    typePrevious = ''
-    dataFormat = ''
-    prevPressURLFileName = ''
-
+    com = None
+    settingDict = dict()
     prevPressURL = list()
     saveData = list()
 
+    tagSaveDir = '[0]'
+    tagDebug = '[a]'
+    tagSaveFolder = '[b]'
+    tagSaveFileName = '[c]'
+    tagBaseURL = '[d]'
+    tagTopURL = '[e]'
+    tagPreviousPDFLinkURL = '[f]'
+    tagTypeLast = '[g]'
+    tagTypePrevious = '[h]'
+    tagDataFormat = '[i]'
+    tagPrevPressURL = '[m]'
+
     # コンストラクタ
     def __init__(self):
-        pass
+        self.com = comFunction.common()
     
     def setSettingData(self):
         # 設定ファイルから必要な情報を取得する
-        # タグ
-        tag_debug = '[a]'
-        tag_saveFolder = '[b]'
-        tag_saveFileName = '[c]'
-        tag_baseURL = '[d]'
-        tag_topURL = '[e]'
-        tag_previousPDFLinkURL = '[f]'
-        tag_typeLast = '[g]'
-        tag_typePrevious = '[h]'
-        tag_dataFormat = '[i]'
-        tag_prevPressURL = '[m]'
-        isDebug = False
-        
-        # カレントディレクトリ取得
-        currentDir = '/'
-        try:
-            # Node-RED から呼び出し
-            currentDir = os.path.dirname(__file__) + '/'
-        except:
-            # jupyterNotebook から呼び出し
-            currentDir = os.path.dirname(os.path.abspath("__file__")) + '/'
-        print(currentDir)
-        
-        try:
-            with open(currentDir + '_Setting.txt', mode='r') as f:
-                lines = f.readlines()
-                for l in lines:
-                    if l.startswith(tag_debug, 0, 3):
-                        if (l.replace(tag_debug, '').rstrip()).lower() == 'true':
-                            isDebug = True
-                        else:
-                            isDebug = False                    
+        # 先頭は必ず SaveDir にする
+        self.settingDict = self.com.getSettingData([
+            self.tagSaveDir,
+            self.tagDebug,
+            self.tagSaveFolder,
+            self.tagSaveFileName,
+            self.tagBaseURL,
+            self.tagTopURL,
+            self.tagPreviousPDFLinkURL,
+            self.tagTypeLast,
+            self.tagTypePrevious,
+            self.tagDataFormat,
+            self.tagPrevPressURL
+            ])        
+        self.com.infoMsg(sys._getframe().f_code.co_name, json.dumps(self.settingDict))
 
-                    if l.startswith(tag_saveFolder, 0, 3):
-                        self.saveFolder = currentDir + l.replace(tag_saveFolder, '').rstrip()
+        if len(self.settingDict) <= 0:
+            self.com.errMsg(sys._getframe().f_code.co_name, 'SettingData is none...')
+            return
 
-                    if l.startswith(tag_saveFileName, 0, 3):
-                        self.saveFileName = l.replace(tag_saveFileName, '').rstrip()
-
-                    if l.startswith(tag_baseURL, 0, 3):
-                        self.baseURL = l.replace(tag_baseURL, '').rstrip()
-
-                    if l.startswith(tag_topURL, 0, 3):
-                        self.topURL = l.replace(tag_topURL, '').rstrip()
-
-                    if l.startswith(tag_previousPDFLinkURL, 0, 3):
-                        self.previousPDFLinkURL = l.replace(tag_previousPDFLinkURL, '').rstrip()
-
-                    if l.startswith(tag_typeLast, 0, 3):
-                        self.typeLast = l.replace(tag_typeLast, '').rstrip()
-
-                    if l.startswith(tag_typePrevious, 0, 3):
-                        self.typePrevious = l.replace(tag_typePrevious, '').rstrip()
-
-                    if l.startswith(tag_dataFormat, 0, 3):
-                        self.dataFormat = l.replace(tag_dataFormat, '').rstrip()
-
-                    if l.startswith(tag_prevPressURL, 0, 3):
-                        self.prevPressURLFileName = l.replace(tag_prevPressURL, '').rstrip()
-
-        except:
-            print('[!!!ERROR!!!] Read Setting Text')
-
-        # 過去プレスリスト作成
-#        iFile = self.saveFolder + '/' + self.prevPressURLFileName
-#        with open(iFile, mode='r') as fs:
-#            for line in fs:
-#                self.prevPressURL.append(line)
-
-
-        return isDebug
+        if self.settingDict[self.tagDebug] == 'true':
+            self.com.setDebug(True)
+        else:
+            self.com.setDebug(False)
         
     def checkInitialize(self):
-        if len(self.saveFolder) <= 0:
-            print('[!!!ERROR!!!] Save FolderName is Empty!')
+        if len(self.settingDict[self.tagSaveFolder]) <= 0:
+            self.com.errMsg(sys._getframe().f_code.co_name, 'Save FolderName is Empty!')
             return False    
-        if len(self.saveFileName) <= 0:
-            print('[!!!ERROR!!!] Save FileName is Empty!')
+        if len(self.settingDict[self.tagSaveFileName]) <= 0:
+            self.com.errMsg(sys._getframe().f_code.co_name, 'Save FileName is Empty!')
             return False    
         return True        
         
     def createSaveFolderAndFile(self):
-        if not os.path.exists(self.saveFolder):
-            os.mkdir(self.saveFolder)
-        oFile = self.saveFolder + '/' + self.saveFileName
+        if not os.path.exists(self.settingDict[self.tagSaveFolder]):
+            os.mkdir(self.settingDict[self.tagSaveFolder])
+        oFile = self.settingDict[self.tagSaveFolder] + '/' + self.settingDict[self.tagSaveFileName]
         if not os.path.exists(oFile):
             f = open(oFile,'w')
             f.close()
 
 
     def getSettingData(self):
-        return self.baseURL, self.topURL, self.previousPDFLinkURL, self.typeLast, self.typePrevious, self.dataFormat
+        return \
+        self.settingDict[self.tagBaseURL], \
+        self.settingDict[self.tagTopURL], \
+        self.settingDict[self.tagPreviousPDFLinkURL], \
+        self.settingDict[self.tagTypeLast], \
+        self.settingDict[self.tagTypePrevious], \
+        self.settingDict[self.tagDataFormat]
 
     def getPrevURL(self):
         return self.prevPressURL
@@ -173,23 +125,25 @@ class base:
         self.saveData.append(_data)
         
     def saveGetData(self):
-        print('[Save Data]')
+        self.com.infoMsg(sys._getframe().f_code.co_name, 'Save Data')
         if len(self.saveData) <= 0:
-            print('No Data...')
+            self.com.errMsg(sys._getframe().f_code.co_name, 'No Data...')
             return
         
         # リスト作成
-        oFile = self.saveFolder + '/' + self.saveFileName
+        oFile = self.settingDict[self.tagSaveDir] + '/' \
+        + self.settingDict[self.tagSaveFolder] + '/' \
+        + self.settingDict[self.tagSaveFileName]
 
         # 重複データは再度追加しない
         _alreadyGetURL = list()
         with open(oFile, mode='r') as fs:
             for line in fs:
                 if len(line) <= 0:
-                    print("Size Zero")  
+                    self.com.infoMsg(sys._getframe().f_code.co_name, 'Size Zero')
                     continue
                 if not ( set(('{', '}')) <= set(line)):
-                    print("Not Json Format :" + line)  
+                    self.com.infoMsg(sys._getframe().f_code.co_name, 'Not Json Format : ' + line)
                     continue
 
                 j = json.loads(line)
@@ -202,7 +156,6 @@ class base:
                     uf.fileWrite(fs, line)
                 else:
                     pass
-#                    print('already get url : ' + line)
         # 重複データ削除    
         uf.fileDataSlim(oFile)    
     
@@ -212,6 +165,7 @@ class base:
 
 # %%
 class work:
+    com = comFunction.common()  
     baseURL = ''
     topURL = ''
     previousPDFLinkURL = ''
@@ -245,10 +199,9 @@ class work:
         _saveData = _saveData.replace("@@url", fullURL)
         return _saveData
         
-    def getURLandSetData(self, d, b):
+    def getURLandSetData(self, b):
         _html = uf.getHTML(self.baseURL + self.topURL)
         bs = uf.getBS4(_html)
-        #d.printLog(bs.body)
 
         _linkLastPath = ""
         _linkPrevPath = b.getPrevURL()
@@ -265,15 +218,14 @@ class work:
                 _linkPrevPath.append(_bsLinkPath["href"])
             
         if len(_linkLastPath) <= 0:
-            print('[!!!ERROR!!!] Search LinkPath(Last) is Empty!')
+            self.com.errMsg(sys._getframe().f_code.co_name, 'Search LinkPath(Last) is Empty!')
             return False
         if len(_linkPrevPath) <= 0:
-            print('[!!!ERROR!!!] Search LinkPath(Previous) is Empty!')
+            self.com.errMsg(sys._getframe().f_code.co_name, 'Search LinkPath(Previous) is Empty!')
             return False
 
         # Last PDF Link
-        print("[get Last PDF Link]")
-        print(_linkLastPath)
+        self.com.infoMsg(sys._getframe().f_code.co_name, '[get Last PDF Link]' + _linkLastPath)
         _html = uf.getHTML(_linkLastPath)
         bs = uf.getBS4(_html)
         _bsPDFPathList = bs.findAll("a", {"class":"resourceLink newWindow"})
@@ -282,9 +234,9 @@ class work:
             b.setSaveData(self.setSaveData(_url["href"], isLast))
         
         # previous PDF Link
-        print("[get Previous PDF Link]")
+        self.com.infoMsg(sys._getframe().f_code.co_name, '[get Previous PDF Link]')
         for _link in _linkPrevPath:
-            print(_link)
+            self.com.infoMsg(sys._getframe().f_code.co_name, _link)
             _html = uf.getHTML(_link)
             bs = uf.getBS4(_html)
             _bsPDFPathList = bs.findAll("a", {"class":"icon_pdf"})
@@ -298,28 +250,24 @@ class work:
 # ## 最初に呼ばれる
 
 # %%
-def main():  
-    print("\n[Start]" + uf.getNowTime() + '\n')            
-
+def main():
+    com = comFunction.common()  
+    com.infoMsg(sys._getframe().f_code.co_name, 'Start')
     b = base()
-    isDebug = b.setSettingData()
+    b.setSettingData()
+    
     if not b.checkInitialize():
         return
-    
-    # デバッグの設定
-    d = debug(isDebug)
-
-    w = work(b)
     
     # 保存フォルダ,ファイル作成
     b.createSaveFolderAndFile()
     
-    w.getURLandSetData(d, b)
+    w = work(b)
+    w.getURLandSetData(b)
+    
     b.saveGetData()
     
-    
-    print("\n[ End ]" + uf.getNowTime() + '\n')
-    
+    com.infoMsg(sys._getframe().f_code.co_name, 'End')
 
 # %% [markdown]
 # ## 処理開始
