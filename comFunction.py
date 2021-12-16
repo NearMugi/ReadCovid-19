@@ -11,15 +11,22 @@ class common:
     def __init__(self):
         pass
 
+    def getNowTime(self):
+        '現在の日付を取得する YYYYMMDD_hhmmss'
+        from datetime import datetime, timezone, timedelta
+        import time
+        JST = timezone(timedelta(hours=+9), 'JST')
+        return datetime.fromtimestamp(time.time(), JST).strftime("%Y%m%d_%H%M%S")
+
     def setDebug(self, isDebug):
         global DEBUG
         DEBUG = isDebug
 
     def infoMsg(self, func, msg):
-        print('INFO [' + func + '] ' + msg)
+        print(self.getNowTime() + '\tINFO\t[' + func + '] ' + msg)
         
     def errMsg(self, func, msg):
-        print('ERROR [' + func + '] ' + msg)
+        print(self.getNowTime() + '\tERROR\t[' + func + '] ' + msg)
 
     def getSettingData(self, tagList):
         ''' _Setting.txt から必要な情報を取得する
@@ -33,10 +40,10 @@ class common:
             # jupyterNotebook から呼び出し
             saveDir = os.path.dirname(os.path.abspath("__file__")) + '/'
         if not os.path.exists(saveDir):
-            self.errMsg(__name__, 'Save Data Dir not defined...')
+            self.errMsg(sys._getframe().f_code.co_name, 'Save Data Dir not defined...')
             return dict()
 
-        self.infoMsg(__name__, 'SaveDir : ' + saveDir)
+        self.infoMsg(sys._getframe().f_code.co_name, 'SaveDir : ' + saveDir)
 
         retDict = dict()
         retDict[tagList[0]] = saveDir
@@ -47,13 +54,13 @@ class common:
                     for tag in tagList:
                         if l.startswith(tag, 0, 3):
                             retDict[tag] = l.replace(tag, '').rstrip()
-                            #self.infoMsg(__name__, tag + ' : ' + retDict[tag])
+                            #self.infoMsg(sys._getframe().f_code.co_name, tag + ' : ' + retDict[tag])
         except:
-            self.errMsg(__name__, 'Read Setting Text')
+            self.errMsg(sys._getframe().f_code.co_name, 'Read Setting Text')
             return dict()
 
         if len(retDict) != len(tagList):
-            self.errMsg(__name__, 'GetData Size is not Same to TagList Size...')
+            self.errMsg(sys._getframe().f_code.co_name, 'GetData Size is not Same to TagList Size...')
             return tuple()
 
         return retDict
