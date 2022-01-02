@@ -7,6 +7,8 @@ import comFunction
 import urllib
 
 # %%
+
+
 def getPDF(url, savePath, fn):
     com = comFunction.common()
     savePath = os.path.join(savePath, fn)
@@ -15,7 +17,7 @@ def getPDF(url, savePath, fn):
     except:
         com.errMsg(sys._getframe().f_code.co_name, 'url: ' + url)
         return False
-    return True    
+    return True
 
 
 # %%
@@ -23,22 +25,22 @@ def main():
     com = comFunction.common()
     com.infoMsg(sys._getframe().f_code.co_name, 'Start')
 
-    #設定ファイルから必要な情報を取得する
+    # 設定ファイルから必要な情報を取得する
     settingDict = dict()
     tagSaveDir = '[0]'
-    #タグ
+    # タグ
     tagDebug = '[a]'
     tagSaveFolder = '[b]'
     tagSavePDFFolder = '[B]'
     tagSaveFileName = '[c]'
-    
+
     settingDict = com.getSettingData([
         tagSaveDir,
         tagDebug,
         tagSaveFolder,
         tagSavePDFFolder,
         tagSaveFileName
-        ])        
+    ])
     com.infoMsg(sys._getframe().f_code.co_name, json.dumps(settingDict))
 
     if len(settingDict) <= 0:
@@ -54,12 +56,12 @@ def main():
     _savePDFFolder = settingDict[tagSavePDFFolder]
     _saveFileName = settingDict[tagSaveFileName]
 
-    baseText =_saveFolder + "/" + _saveFileName
+    baseText = _saveFolder + "/" + _saveFileName
     com.infoMsg(sys._getframe().f_code.co_name, 'URLList : ' + baseText)
 
     # フォルダ作成
-    os.makedirs(_savePDFFolder, exist_ok = True)
-    
+    os.makedirs(_savePDFFolder, exist_ok=True)
+
     # ファイルを開く
     updateList = list()
     with open(baseText, mode='r') as f:
@@ -68,8 +70,9 @@ def main():
             if len(line) <= 0:
                 com.infoMsg(sys._getframe().f_code.co_name, 'Size Zero')
                 continue
-            if not ( set(('{', '}')) <= set(line)):
-                com.infoMsg(sys._getframe().f_code.co_name, 'Not Json Format : ' + line)
+            if not (set(('{', '}')) <= set(line)):
+                com.infoMsg(sys._getframe().f_code.co_name,
+                            'Not Json Format : ' + line)
                 continue
 
             l = line
@@ -80,8 +83,10 @@ def main():
             if isGetPDF == "False":
                 if getPDF(URL, _savePDFFolder, fileName):
                     cnt += 1
-                    com.infoMsg(sys._getframe().f_code.co_name, 'Access URL : ' + URL + '  ' + str(cnt))
-                    l = l.replace('"isGetPDF" : "False"', '"isGetPDF" : "True"')
+                    com.infoMsg(sys._getframe().f_code.co_name,
+                                'Access URL : ' + URL + '  ' + str(cnt))
+                    l = l.replace('"isGetPDF" : "False"',
+                                  '"isGetPDF" : "True"')
 
             updateList.append(l)
 
@@ -90,14 +95,12 @@ def main():
     # ファイル更新
     with open(baseText, mode='w') as f:
         for line in updateList:
-                uf.fileWrite(f, line)
+            uf.fileWrite(f, line)
     # 重複データ削除
-    uf.fileDataSlim(baseText) 
+    uf.fileDataSlim(baseText)
 
     com.infoMsg(sys._getframe().f_code.co_name, 'End')
-    
-    
+
+
 if __name__ == '__main__':
     main()
-
-

@@ -17,7 +17,8 @@ tagSaveOutputListName = '[k]'
 tagPrevPressURLName = '[m]'
 tagLogName = '[o]'
 tagHeader = '[p]'
-    
+
+
 def getSettingData():
     # 設定ファイルから必要な情報を取得する
     # 先頭は必ず SaveDir にする
@@ -31,7 +32,7 @@ def getSettingData():
         tagPrevPressURLName,
         tagLogName,
         tagHeader
-        ])
+    ])
 
     retDict = dict()
     if len(settingDict) <= 0:
@@ -49,14 +50,13 @@ def getSettingData():
 
     return retDict, 0
 
+
 if __name__ == '__main__':
     com = comFunction.common()
     com.infoMsg(sys._getframe().f_code.co_name, 'Start')
     ret, isError = getSettingData()
     com.infoMsg(sys._getframe().f_code.co_name, 'End')
-    
+
     # return Data
     print(json.dumps(ret))
-    sys.exit(isError)   
-
-
+    sys.exit(isError)

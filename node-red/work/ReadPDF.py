@@ -1,23 +1,21 @@
-# To add a new cell, type '# %%'
-# To add a new markdown cell, type '# %% [markdown]'
 # %% [markdown]
 # https://www.fukushihoken.metro.tokyo.lg.jp/hodo/saishin/hassei.html
-# 
+#
 # # TODO
-# * PDFを読み込むとき、数字がくっついてしまうときがある  
-# 20210731  20210801_0801-01-01.pdf  
-# 20210814  
+# * PDFを読み込むとき、数字がくっついてしまうときがある
+# 20210731  20210801_0801-01-01.pdf
+# 20210814
 # -> char_margin = 1.0 としてみた(デフォは2.0)
-# 
-# * データ数が多い日がある(年代別かも)  
+#
+# * データ数が多い日がある(年代別かも)
 # -> 取得するデータ数を固定にした
 
 # %%
 import os
+import sys
 from WebScrapingTool import Base_UserFunction as uf
+import comFunction
 import json
-import urllib
-
 
 # %%
 # https://www.shibutan-bloomers.com/python_library_pdfminer-six/2124/#21PDFJupyterNotebook
@@ -47,18 +45,22 @@ from japanera import Japanera, EraDate
 import unicodedata
 import copy
 import math
+com = comFunction.common()
 
 janera = Japanera()
 
 SPLITWORD = '@@'
+
 
 def get_objs(layout, results):
     if not isinstance(layout, LTContainer):
         return
     for obj in layout:
         if isinstance(obj, LTTextLine):
-            results.append({'bbox': obj.bbox, 'text' : obj.get_text(), 'type' : type(obj)})
+            results.append(
+                {'bbox': obj.bbox, 'text': obj.get_text(), 'type': type(obj)})
         get_objs(obj, results)
+
 
 def readPDF(filePath, type):
     pdfList = []
@@ -69,8 +71,8 @@ def readPDF(filePath, type):
         if not document.is_extractable:
             raise PDFTextExtractionNotAllowed
         laparams = LAParams(
-            char_margin = 1.0,
-            all_texts = True,
+            char_margin=1.0,
+            all_texts=True,
         )
         rsrcmgr = PDFResourceManager()
         device = PDFPageAggregator(rsrcmgr, laparams=laparams)
@@ -81,7 +83,7 @@ def readPDF(filePath, type):
             results = []
             get_objs(layout, results)
             for r in results:
-#                print(r)
+                #                print(r)
                 posX1 = r['bbox'][0]
                 posY1 = r['bbox'][1]
                 #posX2 = r['bbox'][2]
@@ -96,10 +98,10 @@ def readPDF(filePath, type):
                 text = text.replace('\n', '')
                 pdfList.append(
                     {
-                    "posX" : math.floor(posX1), 
-                    "posY" : posYCenter, 
-                    "height" : math.floor(height), 
-                    "text" : text
+                        "posX": math.floor(posX1),
+                        "posY": posYCenter,
+                        "height": math.floor(height),
+                        "text": text
                     }
                 )
                 posYSet.add(posYCenter)
@@ -108,7 +110,7 @@ def readPDF(filePath, type):
             break
     # sort
     # 左から順番にデータを読むため、ソートする
-    pdfList = sorted(pdfList, key=lambda x:x['posX'])
+    pdfList = sorted(pdfList, key=lambda x: x['posX'])
 
     # 同じY座標のデータ(閾値あり)は一つに統一する
     # x, height は最初に見つかった文字のサイズ
@@ -120,26 +122,27 @@ def readPDF(filePath, type):
 #        print("Target Position " + str(y))
         for l in pdfList:
             if l['posY'] >= y - range and l['posY'] <= y + range:
-#                print(l['text'])
+                #                print(l['text'])
                 if not isFind:
-                   _addDict = l.copy()
-                   isFind = True
+                    _addDict = l.copy()
+                    isFind = True
                 else:
                     _addDict["text"] = _addDict["text"] + SPLITWORD + l['text']
         mergePdfList.append(_addDict)
     # sort
-    mergePdfList = sorted(mergePdfList, key=lambda x:x['posY'], reverse=True)
+    mergePdfList = sorted(mergePdfList, key=lambda x: x['posY'], reverse=True)
 
     return mergePdfList
 
+
 def parse(filePath, type):
-#    print("parse start : " + filePath)
+    #    print("parse start : " + filePath)
     try:
         pdfList = readPDF(filePath, type)
-        #print(pdfList)
+        # print(pdfList)
     except:
         return "file open error... : " + filePath, False
-    
+
     modeSokuhouHeader = '別紙'
     modeAddHeader = '【追加情報】'
     typeAge = 'age'
@@ -211,11 +214,11 @@ def parse(filePath, type):
                     else:
                         # ヘッダーを一時保存(PDFごとに列数が異なるため)
                         if type == typeAge:
-                            tmpHeader = text                        
+                            tmpHeader = text
 
                         elif type == typeSeriouslyIll:
                             if not w in text:
-                                tmpHeader = text                        
+                                tmpHeader = text
 
             # 数字を取得、文字が出てきたら終了
             if isFindNumber:
@@ -230,7 +233,8 @@ def parse(filePath, type):
                     tmpHeader = tmpHeader.replace(SPLITWORD, '')
 
                     idx = 0
-                    keyList = ['mi', '10', '20', '30', '40', '50', '60', '70', '80', '90', 'hu', 'un']
+                    keyList = ['mi', '10', '20', '30', '40',
+                               '50', '60', '70', '80', '90', 'hu', 'un']
                     for key in keyList:
                         if key in tmpHeader:
                             tmpGetList.append(tmpList[idx])
@@ -238,7 +242,8 @@ def parse(filePath, type):
                             tmpHeader = tmpHeader[2:]
                         else:
                             tmpGetList.append('0')
-                    print(tmpGetList)
+                    com.infoMsg(sys._getframe().f_code.co_name,
+                                'Get List : ' + ' '.join(s for s in tmpGetList))
                     # データは1行しかないので、必ず終了
                     isEnd = True
 
@@ -254,10 +259,11 @@ def parse(filePath, type):
                     tmpHeader = tmpHeader.replace('女', 'fe')
                     tmpHeader = tmpHeader.replace('代', '')
                     tmpHeader = tmpHeader.replace(SPLITWORD, '')
-                    #print(tmpHeader)
-                            
+                    # print(tmpHeader)
+
                     idx = 0
-                    keyList = ['mi', '10', '20', '30', '40', '50', '60', '70', '80', '90', 'hu', 'u1', 'ma', 'fe', 'u2']
+                    keyList = ['mi', '10', '20', '30', '40', '50', '60',
+                               '70', '80', '90', 'hu', 'u1', 'ma', 'fe', 'u2']
                     for key in keyList:
                         if key in tmpHeader:
                             tmpGetList.append(tmpList[idx])
@@ -266,11 +272,11 @@ def parse(filePath, type):
                         else:
                             tmpGetList.append('0')
 
-                    #print(tmpList)
-                    print(tmpGetList)
+                    com.infoMsg(sys._getframe().f_code.co_name,
+                                'Get List : ' + ' '.join(s for s in tmpGetList))
                     # データは1行しかないので、必ず終了
                     isEnd = True
-                
+
                 # 今のところここは通らない
                 else:
                     tmpList = text.split(SPLITWORD)
@@ -285,7 +291,7 @@ def parse(filePath, type):
                 break
         tmpDict[w] = tmpGetList
 
-    # output 
+    # output
     retData = '{'
     retData += '"date" : "' + _date + '", '
     retData += '"isAdd" : "' + str(isAdd) + '", '
@@ -301,79 +307,63 @@ def parse(filePath, type):
 
 # %%
 def main():
-    print("\n[Start]"  + uf.getNowTime() + '\n')
+    com = comFunction.common()
+    com.infoMsg(sys._getframe().f_code.co_name, 'Start')
 
-    #設定ファイルから必要な情報を取得する
-    #タグ
-    tag_debug = '[a]'
-    tag_saveFolder = '[b]'
-    tag_loadPDFFolder = '[B]'
-    tag_loadFileName = '[c]'
-    tag_saveFileName = '[j]'
-    tag_parseLogName = '[o]'
-    
-    isDebug = False
-    _saveFolder = ''
-    _loadPDFFolder = ''
-    _loadFileName = ''
-    _saveFileName = ''
-    _parseLogName = ''
+    # 設定ファイルから必要な情報を取得する
+    settingDict = dict()
+    tagSaveDir = '[0]'
+    # タグ
+    tagDebug = '[a]'
+    tagSaveFolder = '[b]'
+    tagLoadPDFFolder = '[B]'
+    tagLoadFileName = '[c]'
+    tagSaveFileName = '[j]'
+    tagParseLogName = '[o]'
 
-    # カレントディレクトリ取得
-    currentDir = '/'
-    try:
-        # Node-RED から呼び出し
-        currentDir = os.path.dirname(__file__) + '/'
-    except:
-        # jupyterNotebook から呼び出し
-        currentDir = os.path.dirname(os.path.abspath("__file__")) + '/'
-    print(currentDir)
+    settingDict = com.getSettingData([
+        tagSaveDir,
+        tagDebug,
+        tagSaveFolder,
+        tagLoadPDFFolder,
+        tagLoadFileName,
+        tagSaveFileName,
+        tagParseLogName
+    ])
+    com.infoMsg(sys._getframe().f_code.co_name, json.dumps(settingDict))
 
-    try:
-        with open(currentDir + '_Setting.txt', mode='r') as f:
-            lines = f.readlines()
-            for l in lines:
-                if l.startswith(tag_debug, 0, 3):
-                    if (l.replace(tag_debug, '').rstrip()).lower() == 'true':
-                        isDebug = True
-                    else:
-                        isDebug = False                    
+    if len(settingDict) <= 0:
+        com.errMsg(sys._getframe().f_code.co_name, 'SettingData is none...')
+        return
 
-                if l.startswith(tag_saveFolder, 0, 3):
-                    _saveFolder = currentDir + l.replace(tag_saveFolder, '').rstrip()
-             
-                if l.startswith(tag_loadPDFFolder, 0, 3):
-                    _loadPDFFolder = currentDir + l.replace(tag_loadPDFFolder, '').rstrip()
-             
-                if l.startswith(tag_loadFileName, 0, 3):
-                    _loadFileName = l.replace(tag_loadFileName, '').rstrip()
-             
-                if l.startswith(tag_saveFileName, 0, 3):
-                    _saveFileName = l.replace(tag_saveFileName, '').rstrip()
-             
-                if l.startswith(tag_parseLogName, 0, 3):
-                    _parseLogName = l.replace(tag_parseLogName, '').rstrip()
-             
-    except:
-        print('[!!!ERROR!!!] Read Setting.text')
-        return        
-    
+    if settingDict[tagDebug] == 'true':
+        com.setDebug(True)
+    else:
+        com.setDebug(False)
+
+    _saveFolder = settingDict[tagSaveFolder]
+    _loadPDFFolder = settingDict[tagLoadPDFFolder]
+    _loadFileName = settingDict[tagLoadFileName]
+    _saveFileName = settingDict[tagSaveFileName]
+    _parseLogName = settingDict[tagParseLogName]
+
     if len(_saveFolder) <= 0:
-        print('[!!!ERROR!!!] Image data storage folder is None!')
-        return  
+        com.errorMsg(sys._getframe().f_code.co_name,
+                     'Image data storage folder is None!')
+        return
 
-    baseFile =_saveFolder + "/" + _loadFileName
-    print(baseFile)
+    baseFile = _saveFolder + "/" + _loadFileName
+    com.infoMsg(sys._getframe().f_code.co_name, 'Base File : ' + baseFile)
 
-    saveFile =_saveFolder + "/" + _saveFileName
-    print(saveFile)
-    
+    saveFile = _saveFolder + "/" + _saveFileName
+    com.infoMsg(sys._getframe().f_code.co_name, 'Save File : ' + saveFile)
+
     _parseLogName = _parseLogName.replace('DATE', uf.getNowTime())
-    logFile =_saveFolder + "/" + _parseLogName
-    print(logFile)
-    
+    logFile = _saveFolder + "/" + _parseLogName
+    com.infoMsg(sys._getframe().f_code.co_name, 'Log File : ' + logFile)
+
     with open(logFile, mode='w') as f:
-        uf.fileWrite(f, uf.getNowTime() + '\n') 
+        uf.fileWrite(f, uf.getNowTime() + '\n')
 
     # ファイルを開く
     updateList = list()
@@ -382,10 +372,11 @@ def main():
         cnt = 0
         for line in f:
             if len(line) <= 0:
-                print("Size Zero")  
+                com.infoMsg(sys._getframe().f_code.co_name, 'Size Zero')
                 continue
-            if not ( set(('{', '}')) <= set(line)):
-                print("Not Json Format :" + line)  
+            if not (set(('{', '}')) <= set(line)):
+                com.infoMsg(sys._getframe().f_code.co_name,
+                            'Not Json Format :' + line)
                 continue
 
             l = line
@@ -396,38 +387,34 @@ def main():
             if isParse == "False":
                 _data, isGet = parse(_loadPDFFolder + "/" + fileName, type)
                 with open(logFile, mode='a') as flog:
-                    uf.fileWrite(flog, uf.getNowTime() + "\t" + fileName + "\t" + _data  + '\n')                 
+                    uf.fileWrite(flog, uf.getNowTime() + "\t" +
+                                 fileName + "\t" + _data + '\n')
                 if not isGet:
                     continue
                 parseList.append(_data + "\n")
                 cnt += 1
-                print("...Parse PDF : " + fileName + '  ' + str(cnt))
+                com.infoMsg(sys._getframe().f_code.co_name,
+                            'Parse PDF : ' + fileName + '  ' + str(cnt))
                 l = l.replace('"isParse" : "False"', '"isParse" : "True"')
-               
+
             updateList.append(l)
 
-        print('\n...Get Size :' + str(cnt) + '\n')
+        com.infoMsg(sys._getframe().f_code.co_name, 'Get Size :' + str(cnt))
 
     # ファイル更新
     with open(baseFile, mode='w') as f:
         for line in updateList:
-                uf.fileWrite(f, line)
+            uf.fileWrite(f, line)
 
     # パースしたデータを追加
     with open(saveFile, mode='a') as f:
         for line in parseList:
-                uf.fileWrite(f, line)
+            uf.fileWrite(f, line)
     # 重複データ削除
-    uf.fileDataSlim(saveFile) 
+    uf.fileDataSlim(saveFile)
 
-    print("\n[ End ]"  + uf.getNowTime() + '\n')
-    
-    
+    com.infoMsg(sys._getframe().f_code.co_name, 'End')
+
+
 if __name__ == '__main__':
     main()
-
-
-# %%
-
-
-

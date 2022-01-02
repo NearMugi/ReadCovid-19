@@ -1,12 +1,12 @@
 # %% [markdown]
-# # 東京都福祉保健局のHPから新型コロナウイルスに関連した患者の発生について（過去1週間分）のPDFのURLをテキストに出力  
-#   
-# ## 仕様  
+# # 東京都福祉保健局のHPから新型コロナウイルスに関連した患者の発生について（過去1週間分）のPDFのURLをテキストに出力
+#
+# ## 仕様
 # - https://www.fukushihoken.metro.tokyo.lg.jp/hodo/saishin/hassei.html からpdfのパスを取得する
-# - htmlの解析はBeautifulsoupを使っている。  
-# - テキストは指定したフォルダへ保存する  
-# 
-# ## 構成  
+# - htmlの解析はBeautifulsoupを使っている。
+# - テキストは指定したフォルダへ保存する
+#
+# ## 構成
 # - Setting.text
 #   - 設定ファイル
 #     - 保存先の親フォルダを指定
@@ -16,16 +16,16 @@
 #   - URLテキストからPDFを出力する
 # - getParseDataFromPDF.py
 #   - PDFファイルを読み込み、パースした情報を取得する
-# 
+#
 # ## URLテキスト(json)の形式
-# 
+#
 # - name : PDFファイル名
 # - url : 取得元のURL
 # - isGetPDF : PDFファイルを取得している場合はTrue
-# 
+#
 # ### name
-# 
-# 
+#
+#
 
 # %% [markdown]
 # ## import
@@ -63,7 +63,7 @@ class base:
     # コンストラクタ
     def __init__(self):
         self.com = comFunction.common()
-    
+
     def setSettingData(self):
         # 設定ファイルから必要な情報を取得する
         # 先頭は必ず SaveDir にする
@@ -79,76 +79,82 @@ class base:
             self.tagTypePrevious,
             self.tagDataFormat,
             self.tagPrevPressURL
-            ])        
-        self.com.infoMsg(sys._getframe().f_code.co_name, json.dumps(self.settingDict))
+        ])
+        self.com.infoMsg(sys._getframe().f_code.co_name,
+                         json.dumps(self.settingDict))
 
         if len(self.settingDict) <= 0:
-            self.com.errMsg(sys._getframe().f_code.co_name, 'SettingData is none...')
+            self.com.errMsg(sys._getframe().f_code.co_name,
+                            'SettingData is none...')
             return
 
         if self.settingDict[self.tagDebug] == 'true':
             self.com.setDebug(True)
         else:
             self.com.setDebug(False)
-        
+
     def checkInitialize(self):
         if len(self.settingDict[self.tagSaveFolder]) <= 0:
-            self.com.errMsg(sys._getframe().f_code.co_name, 'Save FolderName is Empty!')
-            return False    
+            self.com.errMsg(sys._getframe().f_code.co_name,
+                            'Save FolderName is Empty!')
+            return False
         if len(self.settingDict[self.tagSaveFileName]) <= 0:
-            self.com.errMsg(sys._getframe().f_code.co_name, 'Save FileName is Empty!')
-            return False    
-        return True        
-        
+            self.com.errMsg(sys._getframe().f_code.co_name,
+                            'Save FileName is Empty!')
+            return False
+        return True
+
     def createSaveFolderAndFile(self):
         if not os.path.exists(self.settingDict[self.tagSaveFolder]):
             os.mkdir(self.settingDict[self.tagSaveFolder])
-        oFile = self.settingDict[self.tagSaveFolder] + '/' + self.settingDict[self.tagSaveFileName]
+        oFile = self.settingDict[self.tagSaveFolder] + \
+            '/' + self.settingDict[self.tagSaveFileName]
         if not os.path.exists(oFile):
-            f = open(oFile,'w')
+            f = open(oFile, 'w')
             f.close()
-
 
     def getSettingData(self):
         return \
-        self.settingDict[self.tagBaseURL], \
-        self.settingDict[self.tagTopURL], \
-        self.settingDict[self.tagPreviousPDFLinkURL], \
-        self.settingDict[self.tagTypeLast], \
-        self.settingDict[self.tagTypePrevious], \
-        self.settingDict[self.tagDataFormat]
+            self.settingDict[self.tagBaseURL], \
+            self.settingDict[self.tagTopURL], \
+            self.settingDict[self.tagPreviousPDFLinkURL], \
+            self.settingDict[self.tagTypeLast], \
+            self.settingDict[self.tagTypePrevious], \
+            self.settingDict[self.tagDataFormat]
 
     def getPrevURL(self):
         return self.prevPressURL
 
     def setSaveData(self, _data):
         self.saveData.append(_data)
-        
+
     def saveGetData(self):
         self.com.infoMsg(sys._getframe().f_code.co_name, 'Save Data')
         if len(self.saveData) <= 0:
             self.com.errMsg(sys._getframe().f_code.co_name, 'No Data...')
             return
-        
+
         # リスト作成
         oFile = self.settingDict[self.tagSaveDir] + '/' \
-        + self.settingDict[self.tagSaveFolder] + '/' \
-        + self.settingDict[self.tagSaveFileName]
+            + self.settingDict[self.tagSaveFolder] + '/' \
+            + self.settingDict[self.tagSaveFileName]
 
         # 重複データは再度追加しない
         _alreadyGetURL = list()
         with open(oFile, mode='r') as fs:
             for line in fs:
                 if len(line) <= 0:
-                    self.com.infoMsg(sys._getframe().f_code.co_name, 'Size Zero')
+                    self.com.infoMsg(
+                        sys._getframe().f_code.co_name, 'Size Zero')
                     continue
-                if not ( set(('{', '}')) <= set(line)):
-                    self.com.infoMsg(sys._getframe().f_code.co_name, 'Not Json Format : ' + line)
+                if not (set(('{', '}')) <= set(line)):
+                    self.com.infoMsg(
+                        sys._getframe().f_code.co_name, 'Not Json Format : ' + line)
                     continue
 
                 j = json.loads(line)
                 _alreadyGetURL.append(j['url'])
-                
+
         with open(oFile, mode='a') as fs:
             for line in self.saveData:
                 j = json.loads(line)
@@ -156,24 +162,25 @@ class base:
                     uf.fileWrite(fs, line)
                 else:
                     pass
-        # 重複データ削除    
-        uf.fileDataSlim(oFile)    
-    
+        # 重複データ削除
+        uf.fileDataSlim(oFile)
+
 
 # %% [markdown]
 # ## スクレイピング本体
 
 # %%
 class work:
-    com = comFunction.common()  
+    com = comFunction.common()
     baseURL = ''
     topURL = ''
     previousPDFLinkURL = ''
     typeLast = ''
-    typePrevious = ''    
+    typePrevious = ''
     PDFPath = ''
     dataFormat = ''
-    #コンストラクタ
+    # コンストラクタ
+
     def __init__(self, b):
         self.PDFPath = '<p class="pagelinkout">'
         self.baseURL, self.topURL, self.previousPDFLinkURL, self.typeLast, self.typePrevious, self.dataFormat = b.getSettingData()
@@ -191,14 +198,14 @@ class work:
             fullURL = self.baseURL + '/hodo/saishin/' + url
         else:
             type = self.typePrevious
-            fullURL = self.previousPDFLinkURL + url 
+            fullURL = self.previousPDFLinkURL + url
 
         _saveData = self.dataFormat + '\n'
         _saveData = _saveData.replace("@@type", type)
         _saveData = _saveData.replace("@@name", name)
         _saveData = _saveData.replace("@@url", fullURL)
         return _saveData
-        
+
     def getURLandSetData(self, b):
         _html = uf.getHTML(self.baseURL + self.topURL)
         bs = uf.getBS4(_html)
@@ -216,64 +223,69 @@ class work:
             _bsLinkPath = _linkList.find("a", {"class": "externalLink"})
             if _bsLinkPath is not None:
                 _linkPrevPath.append(_bsLinkPath["href"])
-            
+
         if len(_linkLastPath) <= 0:
-            self.com.errMsg(sys._getframe().f_code.co_name, 'Search LinkPath(Last) is Empty!')
+            self.com.errMsg(sys._getframe().f_code.co_name,
+                            'Search LinkPath(Last) is Empty!')
             return False
         if len(_linkPrevPath) <= 0:
-            self.com.errMsg(sys._getframe().f_code.co_name, 'Search LinkPath(Previous) is Empty!')
+            self.com.errMsg(sys._getframe().f_code.co_name,
+                            'Search LinkPath(Previous) is Empty!')
             return False
 
         # Last PDF Link
-        self.com.infoMsg(sys._getframe().f_code.co_name, '[get Last PDF Link]' + _linkLastPath)
+        self.com.infoMsg(sys._getframe().f_code.co_name,
+                         '[get Last PDF Link]' + _linkLastPath)
         _html = uf.getHTML(_linkLastPath)
         bs = uf.getBS4(_html)
-        _bsPDFPathList = bs.findAll("a", {"class":"resourceLink newWindow"})
+        _bsPDFPathList = bs.findAll("a", {"class": "resourceLink newWindow"})
         isLast = True
         for _url in _bsPDFPathList:
             b.setSaveData(self.setSaveData(_url["href"], isLast))
-        
+
         # previous PDF Link
-        self.com.infoMsg(sys._getframe().f_code.co_name, '[get Previous PDF Link]')
+        self.com.infoMsg(sys._getframe().f_code.co_name,
+                         '[get Previous PDF Link]')
         for _link in _linkPrevPath:
             self.com.infoMsg(sys._getframe().f_code.co_name, _link)
             _html = uf.getHTML(_link)
             bs = uf.getBS4(_html)
-            _bsPDFPathList = bs.findAll("a", {"class":"icon_pdf"})
+            _bsPDFPathList = bs.findAll("a", {"class": "icon_pdf"})
             isLast = False
             for _url in _bsPDFPathList:
                 b.setSaveData(self.setSaveData(_url["href"], isLast))
-        
+
         return True
 
 # %% [markdown]
 # ## 最初に呼ばれる
 
 # %%
+
+
 def main():
-    com = comFunction.common()  
+    com = comFunction.common()
     com.infoMsg(sys._getframe().f_code.co_name, 'Start')
     b = base()
     b.setSettingData()
-    
+
     if not b.checkInitialize():
         return
-    
+
     # 保存フォルダ,ファイル作成
     b.createSaveFolderAndFile()
-    
+
     w = work(b)
     w.getURLandSetData(b)
-    
+
     b.saveGetData()
-    
+
     com.infoMsg(sys._getframe().f_code.co_name, 'End')
 
 # %% [markdown]
 # ## 処理開始
 
+
 # %%
 if __name__ == '__main__':
     main()
-
-
