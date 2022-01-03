@@ -81,7 +81,7 @@
     "console": false,
     "tostatus": false,
     "complete": "false",
-    "x": 670,
+    "x": 690,
     "y": 780,
     "wires": []
   },
@@ -121,19 +121,19 @@
     "id": "b5162869.260018",
     "type": "exec",
     "z": "84c18073.bc417",
-    "command": "python -u D:/#WorkSpace/ReadCovid-19/node-red/work/getURL.py",
+    "command": "python -u C:/Users/niamu/Documents/#WorkSpace/ReadCovid-19/node-red/work/getURL.py",
     "addpay": true,
     "append": "",
     "useSpawn": "false",
     "timer": "",
     "oldrc": false,
     "name": "(local)getURL",
-    "x": 340,
+    "x": 360,
     "y": 1160,
     "wires": [
       [
-        "8890f207.06b67",
-        "71e056f9.f61bb8"
+        "71e056f9.f61bb8",
+        "4a6ee837.bf4778"
       ],
       [
         "729fa6cf.a71f78"
@@ -155,7 +155,7 @@
     "y": 200,
     "wires": [
       [
-        "296f165.68c5fea"
+        "bc6f811a.8a69a"
       ]
     ]
   },
@@ -177,14 +177,14 @@
     "checkall": "true",
     "repair": false,
     "outputs": 2,
-    "x": 120,
-    "y": 800,
+    "x": 100,
+    "y": 720,
     "wires": [
       [
-        "11c24c8.778f5b4"
+        "d96da82e.81d448"
       ],
       [
-        "b5162869.260018"
+        "85b4a47a.c16c58"
       ]
     ]
   },
@@ -193,18 +193,18 @@
     "type": "exec",
     "z": "84c18073.bc417",
     "command": "python3 -u /mnt/ReadCovid-19/getURL.py",
-    "addpay": false,
+    "addpay": true,
     "append": "",
     "useSpawn": "false",
     "timer": "",
     "oldrc": false,
     "name": "(GCE)getURL",
-    "x": 340,
+    "x": 360,
     "y": 800,
     "wires": [
       [
-        "97741da2.f27e1",
-        "71e056f9.f61bb8"
+        "71e056f9.f61bb8",
+        "f824e1aa.8e517"
       ],
       [
         "729fa6cf.a71f78"
@@ -230,7 +230,7 @@
     "checkall": "true",
     "repair": false,
     "outputs": 2,
-    "x": 140,
+    "x": 180,
     "y": 320,
     "wires": [
       [
@@ -246,17 +246,17 @@
     "type": "exec",
     "z": "84c18073.bc417",
     "command": "python3 -u /mnt/ReadCovid-19/getSetting.py",
-    "addpay": false,
+    "addpay": true,
     "append": "",
     "useSpawn": "false",
     "timer": "",
     "oldrc": false,
     "name": "(GCE)getSettingParameter",
-    "x": 360,
+    "x": 420,
     "y": 320,
     "wires": [
       [
-        "dfdea358.49f86"
+        "abfdc11f.ad308"
       ],
       [
         "f4978999.2df2f8"
@@ -277,8 +277,8 @@
     "tostatus": false,
     "complete": "payload",
     "targetType": "msg",
-    "x": 790,
-    "y": 300,
+    "x": 810,
+    "y": 280,
     "wires": []
   },
   {
@@ -292,26 +292,26 @@
     "tostatus": false,
     "complete": "payload",
     "targetType": "msg",
-    "x": 810,
-    "y": 340,
+    "x": 830,
+    "y": 320,
     "wires": []
   },
   {
     "id": "e3cc38f9.d47d78",
     "type": "exec",
     "z": "84c18073.bc417",
-    "command": "python -u D:/#WorkSpace/ReadCovid-19/node-red/work/getSetting.py",
-    "addpay": false,
+    "command": "python -u C:/Users/niamu/Documents/#WorkSpace/ReadCovid-19/node-red/work/getSetting.py",
+    "addpay": true,
     "append": "",
     "useSpawn": "false",
     "timer": "",
     "oldrc": false,
     "name": "(local)getSettingParameter",
-    "x": 360,
+    "x": 420,
     "y": 380,
     "wires": [
       [
-        "dfdea358.49f86"
+        "abfdc11f.ad308"
       ],
       [
         "f4978999.2df2f8"
@@ -375,8 +375,8 @@
     "property": "payload",
     "action": "",
     "pretty": false,
-    "x": 630,
-    "y": 400,
+    "x": 650,
+    "y": 420,
     "wires": [
       [
         "c012aa39.044a08"
@@ -388,7 +388,7 @@
     "type": "function",
     "z": "84c18073.bc417",
     "name": "fileName",
-    "func": "msg.filename = msg.localPath + msg.settingFileName;\nreturn msg;",
+    "func": "msg.filename = msg.savePath + msg.settingFileName;\nreturn msg;",
     "outputs": 1,
     "noerr": 0,
     "x": 480,
@@ -490,7 +490,7 @@
     "type": "function",
     "z": "84c18073.bc417",
     "name": "fileName",
-    "func": "msg.filename = msg.localPath + msg.saveFileName;\nreturn msg;",
+    "func": "msg.filename = msg.savePath + msg.saveFileName;\nreturn msg;",
     "outputs": 1,
     "noerr": 0,
     "x": 640,
@@ -540,7 +540,7 @@
     "tostatus": false,
     "complete": "payload",
     "targetType": "msg",
-    "x": 650,
+    "x": 670,
     "y": 1160,
     "wires": []
   },
@@ -555,7 +555,7 @@
     "tostatus": false,
     "complete": "payload",
     "targetType": "msg",
-    "x": 670,
+    "x": 690,
     "y": 1100,
     "wires": []
   },
@@ -600,7 +600,7 @@
     "type": "function",
     "z": "84c18073.bc417",
     "name": "FilePath",
-    "func": "\nmsg.saveFileName = msg.payload[\"0\"];\n\nmsg.filename = msg.localPath;\nmsg.filename += msg.saveFileName;\nmsg.contentType = msg.payload[\"1\"];\nreturn msg;",
+    "func": "\nmsg.saveFileName = msg.payload[\"0\"];\n\nmsg.filename = msg.savePath;\nmsg.filename += msg.saveFileName;\nmsg.contentType = msg.payload[\"1\"];\nreturn msg;",
     "outputs": 1,
     "noerr": 0,
     "x": 780,
@@ -644,18 +644,18 @@
     "type": "exec",
     "z": "84c18073.bc417",
     "command": "python3 -u /mnt/ReadCovid-19/getPDF.py",
-    "addpay": false,
+    "addpay": true,
     "append": "",
     "useSpawn": "false",
     "timer": "",
     "oldrc": false,
     "name": "(GCE)getPDF",
-    "x": 340,
+    "x": 360,
     "y": 860,
     "wires": [
       [
-        "15a77ec5.f5c4f1",
-        "78f89f5b.c6c0d"
+        "78f89f5b.c6c0d",
+        "95a83b33.77c8e8"
       ],
       [
         "729fa6cf.a71f78"
@@ -667,19 +667,19 @@
     "id": "8890f207.06b67",
     "type": "exec",
     "z": "84c18073.bc417",
-    "command": "python -u D:/#WorkSpace/ReadCovid-19/node-red/work/getPDF.py",
+    "command": "python -u C:/Users/niamu/Documents/#WorkSpace/ReadCovid-19/node-red/work/getPDF.py",
     "addpay": true,
     "append": "",
     "useSpawn": "false",
     "timer": "",
     "oldrc": false,
     "name": "(local)getPDF",
-    "x": 340,
+    "x": 360,
     "y": 1220,
     "wires": [
       [
-        "719b370.b894cc8",
-        "78f89f5b.c6c0d"
+        "78f89f5b.c6c0d",
+        "162411b4.e64fee"
       ],
       [
         "729fa6cf.a71f78"
@@ -692,18 +692,18 @@
     "type": "exec",
     "z": "84c18073.bc417",
     "command": "python3 -u /mnt/ReadCovid-19/readPDF.py",
-    "addpay": false,
+    "addpay": true,
     "append": "",
     "useSpawn": "false",
     "timer": "",
     "oldrc": false,
     "name": "(GCE)readPDF",
-    "x": 340,
+    "x": 360,
     "y": 920,
     "wires": [
       [
         "d615f4fe.d0eef8",
-        "86a83435.e0aaf8"
+        "6c69b604.5e4b38"
       ],
       [
         "729fa6cf.a71f78"
@@ -715,19 +715,19 @@
     "id": "719b370.b894cc8",
     "type": "exec",
     "z": "84c18073.bc417",
-    "command": "python -u D:/#WorkSpace/ReadCovid-19/node-red/work/readPDF.py",
+    "command": "python -u C:/Users/niamu/Documents/#WorkSpace/ReadCovid-19/node-red/work/readPDF.py",
     "addpay": true,
     "append": "",
     "useSpawn": "false",
     "timer": "",
     "oldrc": false,
     "name": "(local)readPDF",
-    "x": 340,
+    "x": 360,
     "y": 1280,
     "wires": [
       [
         "d615f4fe.d0eef8",
-        "b7a1eee1.80c2f"
+        "8f619da6.c7326"
       ],
       [
         "729fa6cf.a71f78"
@@ -740,12 +740,12 @@
     "type": "debug",
     "z": "84c18073.bc417",
     "name": "",
-    "active": false,
+    "active": true,
     "tosidebar": true,
     "console": false,
     "tostatus": false,
     "complete": "false",
-    "x": 670,
+    "x": 690,
     "y": 840,
     "wires": []
   },
@@ -759,7 +759,7 @@
     "console": false,
     "tostatus": false,
     "complete": "false",
-    "x": 670,
+    "x": 690,
     "y": 900,
     "wires": []
   },
@@ -768,18 +768,18 @@
     "type": "exec",
     "z": "84c18073.bc417",
     "command": "python3 -u /mnt/ReadCovid-19/mergePDF.py",
-    "addpay": false,
+    "addpay": true,
     "append": "",
     "useSpawn": "false",
     "timer": "",
     "oldrc": false,
     "name": "(GCE)mergePDF",
-    "x": 350,
+    "x": 370,
     "y": 980,
     "wires": [
       [
         "bdf4fd17.7aab1",
-        "3fe05dcd.5c9e92"
+        "d45ebfaa.295ed"
       ],
       [
         "729fa6cf.a71f78"
@@ -797,7 +797,7 @@
     "console": false,
     "tostatus": false,
     "complete": "false",
-    "x": 670,
+    "x": 690,
     "y": 960,
     "wires": []
   },
@@ -805,19 +805,19 @@
     "id": "b7a1eee1.80c2f",
     "type": "exec",
     "z": "84c18073.bc417",
-    "command": "python -u D:/#WorkSpace/ReadCovid-19/node-red/work/mergePDF.py",
+    "command": "python -u C:/Users/niamu/Documents/#WorkSpace/ReadCovid-19/node-red/work/mergePDF.py",
     "addpay": true,
     "append": "",
     "useSpawn": "false",
     "timer": "",
     "oldrc": false,
     "name": "(local)mergePDF",
-    "x": 350,
+    "x": 370,
     "y": 1340,
     "wires": [
       [
         "bdf4fd17.7aab1",
-        "7a088bfa.29fb94"
+        "9a8ee607.fbbe38"
       ],
       [
         "729fa6cf.a71f78"
@@ -858,11 +858,11 @@
     "id": "43314dea.df2b14",
     "type": "function",
     "z": "84c18073.bc417",
-    "name": "localPath",
-    "func": "msg.localPath = \"D:/#WorkSpace/ReadCovid-19/node-red/work/\";\nreturn msg;",
+    "name": "execPath, savePath",
+    "func": "msg.execPath = \"C:/Users/niamu/Documents/#WorkSpace/ReadCovid-19/node-red/work/\";\nmsg.savePath = \"C:/Users/niamu/Documents/#WorkSpace/ReadCovid-19/node-red/work/\";\n\nreturn msg;",
     "outputs": 1,
     "noerr": 0,
-    "x": 460,
+    "x": 500,
     "y": 120,
     "wires": [
       [
@@ -874,11 +874,11 @@
     "id": "7ab902e8.c7139c",
     "type": "function",
     "z": "84c18073.bc417",
-    "name": "localPath",
-    "func": "msg.localPath = \"/mnt/ReadCovid-19/\";\nreturn msg;",
+    "name": "execPath, savePath",
+    "func": "msg.execPath = \"/mnt/ReadCovid-19/\";\nmsg.savePath = \"data/ReadCovid-19/\";\n\nreturn msg;",
     "outputs": 1,
     "noerr": 0,
-    "x": 460,
+    "x": 500,
     "y": 80,
     "wires": [
       [
@@ -894,7 +894,7 @@
     "func": "msg.GCSPath = \"gs://covid19-tokyo/\";\nmsg.settingFileName = \"_Setting.txt\";\n\nreturn msg;",
     "outputs": 1,
     "noerr": 0,
-    "x": 610,
+    "x": 690,
     "y": 120,
     "wires": [
       [
@@ -941,14 +941,14 @@
     "id": "7a088bfa.29fb94",
     "type": "exec",
     "z": "84c18073.bc417",
-    "command": "python -u D:/#WorkSpace/ReadCovid-19/node-red/work/getFileList.py",
+    "command": "python -u C:/Users/niamu/Documents/#WorkSpace/ReadCovid-19/node-red/work/getFileList.py",
     "addpay": true,
     "append": "",
     "useSpawn": "false",
     "timer": "",
     "oldrc": false,
     "name": "(local)getFileList",
-    "x": 340,
+    "x": 360,
     "y": 1400,
     "wires": [
       [
@@ -966,13 +966,13 @@
     "type": "exec",
     "z": "84c18073.bc417",
     "command": "python3 -u /mnt/ReadCovid-19/getFileList.py",
-    "addpay": false,
+    "addpay": true,
     "append": "",
     "useSpawn": "false",
     "timer": "",
     "oldrc": false,
     "name": "(GCE)getFileList",
-    "x": 340,
+    "x": 360,
     "y": 1040,
     "wires": [
       [
@@ -995,7 +995,7 @@
     "console": false,
     "tostatus": false,
     "complete": "false",
-    "x": 670,
+    "x": 690,
     "y": 1020,
     "wires": []
   },
@@ -1020,7 +1020,7 @@
     "type": "function",
     "z": "84c18073.bc417",
     "name": "log",
-    "func": "msg.log = \"start\"\nreturn msg;",
+    "func": "msg.log = \"ReadCovid-19 start\"\nreturn msg;",
     "outputs": 1,
     "noerr": 0,
     "x": 250,
@@ -1051,7 +1051,7 @@
     "type": "function",
     "z": "84c18073.bc417",
     "name": "log",
-    "func": "msg.log = \"end\"\nreturn msg;",
+    "func": "msg.log = \"ReadCovid-19 end\"\nreturn msg;",
     "outputs": 1,
     "noerr": 0,
     "x": 830,
@@ -1088,7 +1088,7 @@
     "tostatus": false,
     "complete": "true",
     "targetType": "full",
-    "x": 770,
+    "x": 830,
     "y": 120,
     "wires": []
   },
@@ -1116,7 +1116,7 @@
     "type": "function",
     "z": "84c18073.bc417",
     "name": "FilePath(outputList)",
-    "func": "var listFolder = msg.SettingParameter.listFolder + '/';\nmsg.filename = msg.localPath;\nmsg.filename += listFolder + msg.SettingParameter.outputList;\nmsg.contentType = \"application/octet-stream\";\nreturn msg;",
+    "func": "var listFolder = msg.SettingParameter.listFolder + '/';\nmsg.filename = msg.savePath;\nmsg.filename += listFolder + msg.SettingParameter.outputList;\nmsg.contentType = \"application/octet-stream\";\nreturn msg;",
     "outputs": 1,
     "noerr": 0,
     "x": 670,
@@ -1174,6 +1174,198 @@
       [
         "dacd3a9d.4665c8",
         "6a8d8c36.d3bde4"
+      ]
+    ]
+  },
+  {
+    "id": "bc6f811a.8a69a",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "argv[1] : savePath",
+    "func": "msg.payload = msg.savePath\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 150,
+    "y": 280,
+    "wires": [
+      [
+        "296f165.68c5fea"
+      ]
+    ]
+  },
+  {
+    "id": "abfdc11f.ad308",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "parseReturnData",
+    "func": "// ログを無視する\n// 最後の値をReturnされたデータと認識する\n// ※空白が入っているので本当は最後から2番目のデータ\nvar _ret = msg.payload;\nvar _array = _ret.split(/\\r\\n|\\n/);\nmsg.payload = _array[_array.length-2];\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 690,
+    "y": 380,
+    "wires": [
+      [
+        "dfdea358.49f86"
+      ]
+    ]
+  },
+  {
+    "id": "d96da82e.81d448",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "argv[1] : savePath",
+    "func": "msg.payload = msg.savePath\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 170,
+    "y": 800,
+    "wires": [
+      [
+        "11c24c8.778f5b4"
+      ]
+    ]
+  },
+  {
+    "id": "f824e1aa.8e517",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "argv[1] : savePath",
+    "func": "msg.payload = msg.savePath\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 170,
+    "y": 860,
+    "wires": [
+      [
+        "97741da2.f27e1"
+      ]
+    ]
+  },
+  {
+    "id": "95a83b33.77c8e8",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "argv[1] : savePath",
+    "func": "msg.payload = msg.savePath\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 170,
+    "y": 920,
+    "wires": [
+      [
+        "15a77ec5.f5c4f1"
+      ]
+    ]
+  },
+  {
+    "id": "6c69b604.5e4b38",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "argv[1] : savePath",
+    "func": "msg.payload = msg.savePath\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 170,
+    "y": 980,
+    "wires": [
+      [
+        "86a83435.e0aaf8"
+      ]
+    ]
+  },
+  {
+    "id": "d45ebfaa.295ed",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "argv[1] : savePath",
+    "func": "msg.payload = msg.savePath\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 170,
+    "y": 1040,
+    "wires": [
+      [
+        "3fe05dcd.5c9e92"
+      ]
+    ]
+  },
+  {
+    "id": "85b4a47a.c16c58",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "argv[1] : savePath",
+    "func": "msg.payload = msg.savePath\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 170,
+    "y": 1160,
+    "wires": [
+      [
+        "b5162869.260018"
+      ]
+    ]
+  },
+  {
+    "id": "4a6ee837.bf4778",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "argv[1] : savePath",
+    "func": "msg.payload = msg.savePath\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 170,
+    "y": 1220,
+    "wires": [
+      [
+        "8890f207.06b67"
+      ]
+    ]
+  },
+  {
+    "id": "162411b4.e64fee",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "argv[1] : savePath",
+    "func": "msg.payload = msg.savePath\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 170,
+    "y": 1280,
+    "wires": [
+      [
+        "719b370.b894cc8"
+      ]
+    ]
+  },
+  {
+    "id": "8f619da6.c7326",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "argv[1] : savePath",
+    "func": "msg.payload = msg.savePath\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 170,
+    "y": 1340,
+    "wires": [
+      [
+        "b7a1eee1.80c2f"
+      ]
+    ]
+  },
+  {
+    "id": "9a8ee607.fbbe38",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "argv[1] : savePath",
+    "func": "msg.payload = msg.savePath\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 170,
+    "y": 1400,
+    "wires": [
+      [
+        "7a088bfa.29fb94"
       ]
     ]
   }
