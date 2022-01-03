@@ -953,7 +953,7 @@
     "wires": [
       [
         "c70e71f8.aacbb",
-        "ee589036.6c453"
+        "1d251fc7.37458"
       ],
       [
         "729fa6cf.a71f78"
@@ -977,7 +977,7 @@
     "wires": [
       [
         "c70e71f8.aacbb",
-        "ee589036.6c453"
+        "1d251fc7.37458"
       ],
       [
         "729fa6cf.a71f78"
@@ -1054,7 +1054,7 @@
     "func": "msg.log = \"ReadCovid-19 end\"\nreturn msg;",
     "outputs": 1,
     "noerr": 0,
-    "x": 830,
+    "x": 850,
     "y": 1960,
     "wires": [
       [
@@ -1156,7 +1156,7 @@
     "tostatus": false,
     "complete": "payload",
     "targetType": "msg",
-    "x": 910,
+    "x": 870,
     "y": 1860,
     "wires": []
   },
@@ -1366,6 +1366,22 @@
     "wires": [
       [
         "7a088bfa.29fb94"
+      ]
+    ]
+  },
+  {
+    "id": "1d251fc7.37458",
+    "type": "function",
+    "z": "84c18073.bc417",
+    "name": "parseReturnData",
+    "func": "// ログを無視する\n// 最後の値をReturnされたデータと認識する\n// ※空白が入っているので本当は最後から2番目のデータ\nvar _ret = msg.payload;\nvar _array = _ret.split(/\\r\\n|\\n/);\nmsg.payload = _array[_array.length-2];\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 690,
+    "y": 1420,
+    "wires": [
+      [
+        "ee589036.6c453"
       ]
     ]
   }

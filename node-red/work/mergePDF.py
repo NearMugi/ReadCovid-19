@@ -62,7 +62,11 @@ def main():
     else:
         com.setDebug(False)
 
-    _saveFolder = settingDict[tagSaveFolder]
+    # Directory
+    _saveDir = settingDict[tagSaveDir]
+    # Folder
+    _saveFolder = _saveDir + settingDict[tagSaveFolder]
+    # File
     _loadFileName = settingDict[tagLoadFileName]
     _saveFileName = settingDict[tagSaveFileName]
 

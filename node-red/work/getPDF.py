@@ -52,8 +52,9 @@ def main():
     else:
         com.setDebug(False)
 
-    _saveFolder = settingDict[tagSaveFolder]
-    _savePDFFolder = settingDict[tagSavePDFFolder]
+    _saveDir = settingDict[tagSaveDir]
+    _saveFolder = _saveDir + settingDict[tagSaveFolder]
+    _savePDFFolder = _saveDir + settingDict[tagSavePDFFolder]
     _saveFileName = settingDict[tagSaveFileName]
 
     baseText = _saveFolder + "/" + _saveFileName

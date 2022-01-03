@@ -340,9 +340,12 @@ def main():
         com.setDebug(True)
     else:
         com.setDebug(False)
-
-    _saveFolder = settingDict[tagSaveFolder]
-    _loadPDFFolder = settingDict[tagLoadPDFFolder]
+    # Directory
+    _saveDir = settingDict[tagSaveDir]
+    # Folder
+    _saveFolder = _saveDir + settingDict[tagSaveFolder]
+    _loadPDFFolder = _saveDir + settingDict[tagLoadPDFFolder]
+    # File
     _loadFileName = settingDict[tagLoadFileName]
     _saveFileName = settingDict[tagSaveFileName]
     _parseLogName = settingDict[tagParseLogName]
