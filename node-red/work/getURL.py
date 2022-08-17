@@ -135,7 +135,7 @@ class base:
             return
 
         # リスト作成
-        oFile = self.settingDict[self.tagSaveDir] + '/' \
+        oFile = self.settingDict[self.tagSaveDir] \
             + self.settingDict[self.tagSaveFolder] + '/' \
             + self.settingDict[self.tagSaveFileName]
 
@@ -150,6 +150,10 @@ class base:
                 if not (set(('{', '}')) <= set(line)):
                     self.com.infoMsg(
                         sys._getframe().f_code.co_name, 'Not Json Format : ' + line)
+                    continue
+                if not all(x in line for x in ('type', 'url', 'name', 'isGetPDF', 'isParse')):
+                    self.com.infoMsg(
+                        sys._getframe().f_code.co_name, 'illegular format : ' + line)
                     continue
 
                 j = json.loads(line)
@@ -247,7 +251,7 @@ class work:
         self.com.infoMsg(sys._getframe().f_code.co_name,
                          '[get Previous PDF Link]')
         for _link in _linkPrevPath:
-            self.com.infoMsg(sys._getframe().f_code.co_name, _link)
+            #self.com.infoMsg(sys._getframe().f_code.co_name, _link)
             _html = uf.getHTML(_link)
             bs = uf.getBS4(_html)
             _bsPDFPathList = bs.findAll("a", {"class": "icon_pdf"})

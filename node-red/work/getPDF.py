@@ -75,6 +75,10 @@ def main():
                 com.infoMsg(sys._getframe().f_code.co_name,
                             'Not Json Format : ' + line)
                 continue
+            if not all(x in line for x in ('type', 'url', 'name', 'isGetPDF', 'isParse')):
+                com.infoMsg(
+                    sys._getframe().f_code.co_name, 'illegular format : ' + line)
+                continue
 
             l = line
             j = json.loads(line)
